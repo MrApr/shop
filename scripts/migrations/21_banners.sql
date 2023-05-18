@@ -1,0 +1,9 @@
+CREATE TABLE `banners`
+(
+    `id`          INTEGER UNSIGNED AUTO_INCREMENT NOT NULL,
+    `title`       VARCHAR(255)                    NOT NULL,
+    `description` VARCHAR(500),
+    `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
