@@ -69,9 +69,22 @@ func (u *UserService) UpdateUser(userId int, name, password *string) (*User, err
 	}
 
 	if password != nil {
-		hashedPass, _ := hasher.Make(*password)
-		password = &hashedPass
+		password, err = u.makePasswordUseAble(password)
+	}
+
+	if err != nil {
+		return nil, advancedError.New(err, "Cannot hash password")
 	}
 
 	return u.repo.UpdateUser(user, name, password)
+}
+
+// makePasswordUseAble for in update operation
+func (u *UserService) makePasswordUseAble(password *string) (*string, error) {
+	hashedPass, err := hasher.Make(*password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hashedPass, nil
 }
