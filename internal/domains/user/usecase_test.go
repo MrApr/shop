@@ -48,12 +48,43 @@ func TestUserUseCase_Register(t *testing.T) {
 
 // TestUserUseCase_UpdateUserName functionality
 func TestUserUseCase_UpdateUserName(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setup database connection failed")
 
+	ctx := context.WithValue(context.Background(), ContextValueIpKey, "192.168.1.1")
+	usecase := createUseCase(db)
+	sv := createService(db)
+	mockedUser := mockUser()
+
+	createdUser, _ := sv.CreateUser(mockedUser.Name, mockedUser.PhoneNumber, mockedUser.Password)
+	mockedJwt, err := mockUserJwtTk(ctx, createdUser.UUID, "192.168.1.1")
+	assert.NoError(t, err, "Mocking Jwt failed")
+
+	mockedUpdateUserRequest := mockUpdateUserRequest()
+
+	result, err := usecase.UpdateUserName(ctx, mockedJwt, mockedUpdateUserRequest)
+	assert.NoError(t, err, "Updating user name failed")
+	assert.NotEqual(t, *mockedUser.Name, *result.Name, "Updating user name failed")
 }
 
 // TestUserUseCase_UpdateUserPass functionality
 func TestUserUseCase_UpdateUserPass(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setup database connection failed")
 
+	ctx := context.WithValue(context.Background(), ContextValueIpKey, "192.168.1.1")
+	usecase := createUseCase(db)
+	sv := createService(db)
+	mockedUser := mockUser()
+
+	createdUser, _ := sv.CreateUser(mockedUser.Name, mockedUser.PhoneNumber, mockedUser.Password)
+	mockedJwt, err := mockUserJwtTk(ctx, createdUser.UUID, "192.168.1.1")
+	assert.NoError(t, err, "Mocking Jwt failed")
+
+	mockedUpdateUserRequest := mockUpdateUserRequest()
+
+	_, err = usecase.UpdateUserPass(ctx, mockedJwt, mockedUpdateUserRequest)
+	assert.NoError(t, err, "Updating user name failed")
 }
 
 // createUseCase and return it for testing purpose
@@ -77,6 +108,17 @@ func mockRegisterRequest() *UserRegisterRequest {
 		Password:        "1234567879",
 		PasswordConfirm: "1234567879",
 		Name:            &name,
+	}
+}
+
+// mockUpdateUserRequest for testing functionality
+func mockUpdateUserRequest() *UpdateUserRequest {
+	newName := "NewtesingNaaaame"
+	newPass := "newtestingPass"
+	return &UpdateUserRequest{
+		Name:            &newName,
+		Password:        &newPass,
+		PasswordConfirm: &newPass,
 	}
 }
 
