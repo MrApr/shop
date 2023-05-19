@@ -14,6 +14,7 @@ func TestUserService_GetUserById(t *testing.T) {
 
 	service := createService(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := service.GetUserById(users[0].Id)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -30,6 +31,7 @@ func TestUserService_GetUserByUUID(t *testing.T) {
 
 	service := createService(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := service.GetUserByUUID(users[0].UUID)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -46,6 +48,7 @@ func TestUserService_GetUserByPhone(t *testing.T) {
 
 	service := createService(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := service.GetUserByPhone(users[0].PhoneNumber)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -64,6 +67,8 @@ func TestUserService_CreateUser(t *testing.T) {
 	mockedUser := mockUser()
 
 	createdUser, err := service.CreateUser(mockedUser.Name, mockedUser.PhoneNumber, mockedUser.Password)
+	defer destructCreatedObjects(db, []User{*createdUser})
+
 	assert.NoError(t, err, "User service user creation failed")
 	assert.NotEqual(t, createdUser.Password, mockedUser.Password, "User service user creation failed")
 	assert.NotZero(t, createdUser.Id, "User service user creation failed")
@@ -80,6 +85,7 @@ func TestUserService_UpdateUser(t *testing.T) {
 
 	service := createService(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	newName := "newlyyyname"
 	pass := "Password"

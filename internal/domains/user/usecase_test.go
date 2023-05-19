@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 	"shop/pkg/tokenizer"
@@ -20,10 +19,11 @@ func TestUserUseCase_Login(t *testing.T) {
 
 	mockedLoginReq := mockLoginRequest()
 	createdUser, err := sv.CreateUser(nil, mockedLoginReq.PhoneNumber, mockedLoginReq.Password)
+	defer destructCreatedObjects(db, []User{*createdUser})
+
 	assert.NoError(t, err, "Use creation in test user use-case failed")
 
 	result, err := usecase.Login(ctx, mockedLoginReq)
-	fmt.Println(result.Tokens)
 	assert.NoError(t, err, "login failed in user use-case")
 	assert.NotNil(t, result.Tokens, "login failed in user use-case")
 	assert.NotNil(t, result.User, "login failed in user use-case")
@@ -40,6 +40,8 @@ func TestUserUseCase_Register(t *testing.T) {
 	ctx := context.WithValue(context.Background(), ContextValueIpKey, "192.168.1.1")
 
 	result, err := useCase.Register(ctx, registerReq)
+	defer destructCreatedObjects(db, []User{*result.User})
+
 	assert.NoError(t, err, "register failed in user use-case")
 	assert.NotNil(t, result.Tokens, "register failed in user use-case")
 	assert.NotNil(t, result.User, "register failed in user use-case")
@@ -57,6 +59,8 @@ func TestUserUseCase_UpdateUserName(t *testing.T) {
 	mockedUser := mockUser()
 
 	createdUser, _ := sv.CreateUser(mockedUser.Name, mockedUser.PhoneNumber, mockedUser.Password)
+	defer destructCreatedObjects(db, []User{*createdUser})
+
 	mockedJwt, err := mockUserJwtTk(ctx, createdUser.UUID, "192.168.1.1")
 	assert.NoError(t, err, "Mocking Jwt failed")
 
@@ -78,6 +82,8 @@ func TestUserUseCase_UpdateUserPass(t *testing.T) {
 	mockedUser := mockUser()
 
 	createdUser, _ := sv.CreateUser(mockedUser.Name, mockedUser.PhoneNumber, mockedUser.Password)
+	defer destructCreatedObjects(db, []User{*createdUser})
+
 	mockedJwt, err := mockUserJwtTk(ctx, createdUser.UUID, "192.168.1.1")
 	assert.NoError(t, err, "Mocking Jwt failed")
 

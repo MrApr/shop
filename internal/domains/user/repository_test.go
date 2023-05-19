@@ -15,6 +15,7 @@ func TestUserRepository_GetUserById(t *testing.T) {
 
 	repo := createRepo(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := repo.GetUserById(users[0].Id)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -31,6 +32,7 @@ func TestUserRepository_GetUserByUUID(t *testing.T) {
 
 	repo := createRepo(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := repo.GetUserByUUID(users[0].UUID)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -47,6 +49,7 @@ func TestUserRepository_GetUserByPhone(t *testing.T) {
 
 	repo := createRepo(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	fetchedUser, err := repo.GetUserByPhone(users[0].PhoneNumber)
 	assertUsersEquality(t, fetchedUser, &users[0])
@@ -63,6 +66,7 @@ func TestUserRepository_UserExists(t *testing.T) {
 
 	repo := createRepo(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	exists := repo.UserExists(users[0].PhoneNumber)
 	assert.True(t, exists, "checking User existence failed")
@@ -82,6 +86,8 @@ func TestUserRepository_CreateUser(t *testing.T) {
 	mockedUser := mockUser()
 
 	createdUser, err := repo.CreateUser(mockedUser)
+	defer destructCreatedObjects(db, []User{*createdUser})
+
 	assert.NoError(t, err, "User creation in repository failed")
 	assertUsersEquality(t, createdUser, mockedUser)
 }
@@ -93,6 +99,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 
 	repo := createRepo(db)
 	users := mockAndInsertUser(db, 1)
+	defer destructCreatedObjects(db, users)
 
 	newName := "new name"
 	newPass := "New pass"
@@ -162,4 +169,11 @@ func assertUsersEquality(t *testing.T, fetchedUser, mockedUser *User) {
 	assert.Equal(t, fetchedUser.Name, mockedUser.Name)
 	assert.Equal(t, fetchedUser.UUID, mockedUser.UUID)
 	assert.Equal(t, fetchedUser.PhoneNumber, mockedUser.PhoneNumber)
+}
+
+// destructCreatedObjects that are created for testing purpose
+func destructCreatedObjects(db *gorm.DB, users []User) {
+	for _, user := range users {
+		db.Unscoped().Delete(user)
+	}
 }
