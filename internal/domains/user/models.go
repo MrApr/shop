@@ -5,7 +5,7 @@ import "time"
 // User struct defines user entity which is used in database
 type User struct {
 	Id          int        `json:"-" gorm:"primaryKey"`
-	Uuid        string     `json:"uuid" gorm:"uniqueIndex"`
+	UUID        string     `json:"uuid" gorm:"uniqueIndex"`
 	PhoneNumber string     `json:"phone_number" gorm:"uniqueIndex"`
 	Name        *string    `json:"name,omitempty"`
 	Password    string     `json:"password"`
