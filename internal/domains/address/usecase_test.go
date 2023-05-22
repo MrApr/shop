@@ -132,7 +132,7 @@ func mockEditRequest(cityId, addressId int) *UpdateAddressRequest {
 	}
 }
 
-// mockDeleteRequest for deleting adresses operation
+// mockDeleteRequest for deleting addresses operation
 func mockDeleteRequest(addrId int) *DeleteAddressRequest {
 	return &DeleteAddressRequest{
 		AddressId: addrId,
