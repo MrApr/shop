@@ -17,7 +17,7 @@ type AddressServiceInterface interface {
 	GetAllCities() ([]City, error)
 	GetAllUserAddresses(userId int) ([]Address, error)
 	CreateAddress(userId, cityId int, address string) (*Address, error)
-	UpdateAddress(requestedId, addressId, cityId int, newAddress string) (*Address, error) //Todo add Authorization on address edit and delete operation check user is the owner or not
+	UpdateAddress(requestedId, addressId, cityId int, newAddress string) (*Address, error)
 	DeleteAddress(requestedId, addressId int) error
 }
 
@@ -29,5 +29,3 @@ type AddressUseCaseInterface interface {
 	UpdateAddress(ctx context.Context, token string, request *UpdateAddressRequest) (*Address, error)
 	DeleteAddress(ctx context.Context, token string, request *DeleteAddressRequest) error
 }
-
-//Todo add global package for handing Authorization in all domains
