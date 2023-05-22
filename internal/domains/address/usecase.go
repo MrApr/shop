@@ -39,17 +39,32 @@ func (a *AddressUseCase) GetAllUserAddresses(ctx context.Context, token string) 
 	return a.sv.GetAllUserAddresses(userId)
 }
 
+// CreateAddress for user and store it in db
 func (a *AddressUseCase) CreateAddress(ctx context.Context, token string, request *CreateAddressRequest) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := a.decoderFn(ctx, token)
+	if err != nil {
+		return nil, advancedError.New(err, "Decoding token failed")
+	}
+
+	return a.sv.CreateAddress(userId, request.CityId, request.Address)
 }
 
+// UpdateAddress which exists already in database for user
 func (a *AddressUseCase) UpdateAddress(ctx context.Context, token string, request *UpdateAddressRequest) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := a.decoderFn(ctx, token)
+	if err != nil {
+		return nil, advancedError.New(err, "Decoding token failed")
+	}
+
+	return a.sv.UpdateAddress(userId, request.AddressId, request.CityId, request.Address)
 }
 
+// DeleteAddress which already exists for user in database
 func (a *AddressUseCase) DeleteAddress(ctx context.Context, token string, request *DeleteAddressRequest) error {
-	//TODO implement me
-	panic("implement me")
+	userId, err := a.decoderFn(ctx, token)
+	if err != nil {
+		return advancedError.New(err, "Decoding token failed")
+	}
+
+	return a.sv.DeleteAddress(userId, request.AddressId)
 }
