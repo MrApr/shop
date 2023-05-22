@@ -73,14 +73,31 @@ func TestAddressRepository_CreateAddress(t *testing.T) {
 	mockedAddress := mockAddress(city[0].Id, userId)
 
 	result, err := repo.CreateAddress(mockedAddress)
-	destructAddresses(conn, []Address{*result})
+	defer destructAddresses(conn, []Address{*result})
 	assert.NoError(t, err, "User address creation failed")
 	assertAddresses(t, []Address{*mockedAddress}, []Address{*result})
 }
 
 // TestAddressRepository_UpdateAddress functionality
 func TestAddressRepository_UpdateAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
 
+	city := mockAndInsertCity(conn, 2)
+	defer destructCities(conn, city)
+
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, 0, 1)
+	oldAddress := mockedAddresses[0]
+	defer destructAddresses(conn, mockedAddresses)
+
+	newAddress := "Edited address"
+
+	result, err := repo.UpdateAddress(&mockedAddresses[0], city[1].Id, newAddress)
+	assert.NoError(t, err, "user address edit failed")
+
+	assert.NotEqual(t, result.Address, oldAddress.Address, "user address edit failed")
+	assert.NotEqual(t, result.CityId, oldAddress.CityId, "user address edit failed")
 }
 
 // TestAddressRepository_DeleteAddress functionality

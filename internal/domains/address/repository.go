@@ -40,9 +40,14 @@ func (a *AddressRepository) CreateAddress(address *Address) (*Address, error) {
 	return address, result.Error
 }
 
+// UpdateAddress which is already exists in database
 func (a *AddressRepository) UpdateAddress(address *Address, cityId int, newAddress string) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	address.CityId = cityId
+	address.Address = newAddress
+
+	result := a.db.Save(address)
+
+	return address, result.Error
 }
 
 func (a *AddressRepository) DeleteAddress(address *Address) (bool, error) {
