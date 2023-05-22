@@ -1,6 +1,9 @@
 package address
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"gorm.io/gorm"
+)
 
 // AddressRepository is the type which has the responsibility for address data access layer
 type AddressRepository struct {
@@ -19,6 +22,14 @@ func (a *AddressRepository) GetAllCities() ([]City, error) {
 	var cities []City
 	result := a.db.Find(&cities)
 	return cities, result.Error
+}
+
+// CityExists checks whether city id exists or not
+func (a *AddressRepository) CityExists(id int) bool {
+	city := new(City)
+	result := a.db.Where("id = ?", id).First(city)
+
+	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
 func (a *AddressRepository) GetAddressById(id int) (*Address, error) {

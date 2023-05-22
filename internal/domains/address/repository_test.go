@@ -25,6 +25,22 @@ func TestAddressRepository_GetAllCities(t *testing.T) {
 	assertCitiesEquivelance(t, mockedCities, cities)
 }
 
+// TestAddressRepository_CityExists functionality
+func TestAddressRepository_CityExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
+
+	mockedCities := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, mockedCities)
+
+	exists := repo.CityExists(mockedCities[0].Id)
+	assert.True(t, exists, "checking city existence from repository failed")
+
+	exists = repo.CityExists(rand.Int())
+	assert.False(t, exists, "checking city existence from repository failed")
+}
+
 // TestAddressRepository_GetAllUserAddresses functionality
 func TestAddressRepository_GetAllUserAddresses(t *testing.T) {
 	conn, err := setupDbConnection()

@@ -5,6 +5,7 @@ import "context"
 // AddressRepositoryInterface defines set of methods that each type who wants to play role as address repository should obey
 type AddressRepositoryInterface interface {
 	GetAllCities() ([]City, error)
+	CityExists(id int) bool
 	GetAddressById(id int) (*Address, error)
 	GetAllUserAddresses(userId int) ([]Address, error)
 	CreateAddress(address *Address) (*Address, error)
