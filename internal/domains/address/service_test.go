@@ -3,6 +3,7 @@ package address
 import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+	"math/rand"
 	"testing"
 )
 
@@ -28,7 +29,24 @@ func TestAddressService_GetAllCities(t *testing.T) {
 
 // TestAddressService_GetAllUserAddresses functionality
 func TestAddressService_GetAllUserAddresses(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	service := createAddressService(conn)
 
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := rand.Int()
+	_, err = service.GetAllUserAddresses(userId)
+	assert.Error(t, err, "Fetching user addresses for user from address service failed")
+	assert.ErrorIs(t, err, NoAddressesFound, "Fetching addresses for user from address service failed")
+
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, userId, 2)
+	defer destructAddresses(conn, mockedAddresses)
+
+	result, err := service.GetAllUserAddresses(userId)
+	assert.NoError(t, err, "Fetching all user addresses failed in user service")
+	assertAddresses(t, result, mockedAddresses)
 }
 
 // TestAddressService_CreateAddress functionality

@@ -21,9 +21,15 @@ func (a *AddressService) GetAllCities() ([]City, error) {
 	return cities, err
 }
 
+// GetAllUserAddresses bases on user id and return them
 func (a *AddressService) GetAllUserAddresses(userId int) ([]Address, error) {
-	//TODO implement me
-	panic("implement me")
+	addresses, err := a.repo.GetAllUserAddresses(userId)
+
+	if len(addresses) == 0 {
+		return nil, NoAddressesFound
+	}
+
+	return addresses, err
 }
 
 func (a *AddressService) CreateAddress(userId, cityId int, address string) (*Address, error) {
