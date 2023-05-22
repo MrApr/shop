@@ -71,7 +71,33 @@ func TestAddressService_CreateAddress(t *testing.T) {
 
 // TestAddressService_UpdateAddress functionality
 func TestAddressService_UpdateAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	service := createAddressService(conn)
 
+	cities := mockAndInsertCity(conn, 2)
+	defer destructCities(conn, cities)
+
+	userId := rand.Int()
+	mockedAddresses := mockAndInsertAddresses(conn, cities[0].Id, userId, 1)
+	defer destructAddresses(conn, mockedAddresses)
+
+	newWrongUserId := rand.Int()
+	newAddress := "new edited address"
+
+	_, err = service.UpdateAddress(newWrongUserId, mockedAddresses[0].Id, cities[1].Id, newAddress)
+	assert.Error(t, err, "UserAddress service update functionality failed")
+	assert.ErrorIs(t, err, YouAreNotAllowed, "UserAddress service update functionality failed")
+
+	_, err = service.UpdateAddress(userId, rand.Int(), cities[1].Id, newAddress)
+	assert.Error(t, err, "UserAddress service update functionality failed")
+	assert.ErrorIs(t, err, AddressNotFound, "UserAddress service update functionality failed")
+
+	editedAddress, err := service.UpdateAddress(userId, mockedAddresses[0].Id, cities[1].Id, newAddress)
+	assert.NoError(t, err, "UserAddress service update functionality failed")
+	assert.Equal(t, editedAddress.Id, mockedAddresses[0].Id, "UserAddress service update functionality failed")
+	assert.Equal(t, editedAddress.Address, newAddress, "UserAddress service update functionality failed")
+	assert.Equal(t, editedAddress.CityId, cities[1].Id, "UserAddress service update functionality failed")
 }
 
 // TestAddressService_DeleteAddress functionality

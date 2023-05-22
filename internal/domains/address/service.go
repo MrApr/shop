@@ -1,9 +1,14 @@
 package address
 
+import "shop/pkg/authorization"
+
 // AddressService is a type which implements all methods of address service interface and plays role as address service
 type AddressService struct {
 	repo AddressRepositoryInterface
 }
+
+// userAddrAuthorizerField is the field which authorization should get done and checked with that
+const userAddrAuthorizerField string = "UserId"
 
 // NewAddressService and return it
 func NewAddressService(repo AddressRepositoryInterface) AddressServiceInterface {
@@ -43,9 +48,18 @@ func (a *AddressService) CreateAddress(userId, cityId int, address string) (*Add
 	return a.repo.CreateAddress(tmpAddr)
 }
 
+// UpdateAddress which exists in database and user is the owner of it
 func (a *AddressService) UpdateAddress(requestedId, addressId, cityId int, newAddress string) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	address, err := a.repo.GetAddressById(addressId)
+	if err != nil {
+		return nil, AddressNotFound
+	}
+
+	if err = authorization.SimpleFieldAuthorization(*address, userAddrAuthorizerField, requestedId, YouAreNotAllowed); err != nil {
+		return nil, err
+	}
+
+	return a.repo.UpdateAddress(address, cityId, newAddress)
 }
 
 func (a *AddressService) DeleteAddress(requestedId, addressId int) error {
