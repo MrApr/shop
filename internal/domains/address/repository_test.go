@@ -1,6 +1,7 @@
 package address
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -44,7 +45,20 @@ func TestAddressRepository_GetAllUserAddresses(t *testing.T) {
 
 // TestAddressRepository_GetAddressById functionality
 func TestAddressRepository_GetAddressById(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
 
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := rand.Int()
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, userId, 1)
+	defer destructAddresses(conn, mockedAddresses)
+
+	result, err := repo.GetAddressById(mockedAddresses[0].Id)
+	assert.NoError(t, err, "Fetching Address by id failed")
+	assertAddresses(t, []Address{*result}, mockedAddresses)
 }
 
 // TestAddressRepository_UpdateAddress functionality
@@ -70,6 +84,7 @@ func mockAndInsertCity(conn *gorm.DB, count int) []City {
 
 		result := conn.Create(mockedCity)
 		if result.Error != nil {
+			fmt.Println(result.Error)
 			continue
 		}
 		cities = append(cities, *mockedCity)
@@ -91,6 +106,7 @@ func mockAndInsertAddresses(db *gorm.DB, cityId, userId, count int) []Address {
 		mockedAddress := mockAddress(cityId, userId)
 		result := db.Create(mockedAddress)
 		if result.Error != nil {
+			fmt.Println(result.Error)
 			continue
 		}
 
@@ -107,8 +123,8 @@ func mockAddress(cityId, userId int) *Address {
 	}
 
 	return &Address{
-		UserId: userId,
-		//CityId:  cityId,
+		UserId:  userId,
+		CityId:  cityId,
 		Address: "Test Address for user",
 	}
 }
