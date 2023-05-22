@@ -9,7 +9,7 @@ type AddressRepositoryInterface interface {
 	GetAllUserAddresses(userId int) ([]Address, error)
 	CreateAddress(address *Address) (*Address, error)
 	UpdateAddress(address *Address, cityId int, newAddress string) (*Address, error)
-	DeleteAddress(address *Address) (bool, error)
+	DeleteAddress(address *Address) error
 }
 
 // AddressServiceInterface defines set of methods that each type who wants to play role as address service should obey

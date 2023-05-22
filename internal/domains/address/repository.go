@@ -50,7 +50,8 @@ func (a *AddressRepository) UpdateAddress(address *Address, cityId int, newAddre
 	return address, result.Error
 }
 
-func (a *AddressRepository) DeleteAddress(address *Address) (bool, error) {
-	//TODO implement me
-	panic("implement me")
+// DeleteAddress which is already exists in database
+func (a *AddressRepository) DeleteAddress(address *Address) error {
+	result := a.db.Delete(address)
+	return result.Error
 }

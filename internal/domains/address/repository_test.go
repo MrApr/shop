@@ -102,7 +102,23 @@ func TestAddressRepository_UpdateAddress(t *testing.T) {
 
 // TestAddressRepository_DeleteAddress functionality
 func TestAddressRepository_DeleteAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
 
+	city := mockAndInsertCity(conn, 2)
+	defer destructCities(conn, city)
+
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, 0, 1)
+	defer destructAddresses(conn, mockedAddresses)
+
+	err = repo.DeleteAddress(&mockedAddresses[0])
+	assert.NoError(t, err, "Deleting address failed")
+
+	var addr Address
+	fetchResult := conn.Where("id = ?", mockedAddresses[0].Id).First(&addr)
+	assert.Error(t, fetchResult.Error, "Deleting address failed")
+	assert.ErrorIs(t, fetchResult.Error, gorm.ErrRecordNotFound, "Deleting address failed")
 }
 
 // mockAndInsertCity in database
