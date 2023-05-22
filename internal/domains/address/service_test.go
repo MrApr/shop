@@ -102,7 +102,31 @@ func TestAddressService_UpdateAddress(t *testing.T) {
 
 // TestAddressService_DeleteAddress functionality
 func TestAddressService_DeleteAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	service := createAddressService(conn)
 
+	cities := mockAndInsertCity(conn, 2)
+	defer destructCities(conn, cities)
+
+	userId := rand.Int()
+	mockedAddresses := mockAndInsertAddresses(conn, cities[0].Id, userId, 1)
+	defer destructAddresses(conn, mockedAddresses)
+
+	newWrongUserId := rand.Int()
+
+	err = service.DeleteAddress(newWrongUserId, mockedAddresses[0].Id)
+	assert.Error(t, err, "UserAddress service delete functionality failed")
+	assert.ErrorIs(t, err, YouAreNotAllowed, "UserAddress service delete functionality failed")
+
+	err = service.DeleteAddress(userId, rand.Int())
+	assert.Error(t, err, "UserAddress service delete functionality failed")
+	assert.ErrorIs(t, err, AddressNotFound, "UserAddress service delete functionality failed")
+
+	err = service.DeleteAddress(userId, mockedAddresses[0].Id)
+	assert.NoError(t, err, "UserAddress service update functionality failed")
+
+	assertIsAddressDeleted(t, conn, mockedAddresses[0].Id)
 }
 
 // createAddressService and return it

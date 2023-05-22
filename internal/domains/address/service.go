@@ -62,7 +62,16 @@ func (a *AddressService) UpdateAddress(requestedId, addressId, cityId int, newAd
 	return a.repo.UpdateAddress(address, cityId, newAddress)
 }
 
+// DeleteAddress that already exists in database for user
 func (a *AddressService) DeleteAddress(requestedId, addressId int) error {
-	//TODO implement me
-	panic("implement me")
+	address, err := a.repo.GetAddressById(addressId)
+	if err != nil {
+		return AddressNotFound
+	}
+
+	if err = authorization.SimpleFieldAuthorization(*address, userAddrAuthorizerField, requestedId, YouAreNotAllowed); err != nil {
+		return err
+	}
+
+	return a.repo.DeleteAddress(address)
 }

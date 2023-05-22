@@ -115,10 +115,7 @@ func TestAddressRepository_DeleteAddress(t *testing.T) {
 	err = repo.DeleteAddress(&mockedAddresses[0])
 	assert.NoError(t, err, "Deleting address failed")
 
-	var addr Address
-	fetchResult := conn.Where("id = ?", mockedAddresses[0].Id).First(&addr)
-	assert.Error(t, fetchResult.Error, "Deleting address failed")
-	assert.ErrorIs(t, fetchResult.Error, gorm.ErrRecordNotFound, "Deleting address failed")
+	assertIsAddressDeleted(t, conn, mockedAddresses[0].Id)
 }
 
 // mockAndInsertCity in database
@@ -221,4 +218,12 @@ func destructAddresses(conn *gorm.DB, addresses []Address) {
 	for _, address := range addresses {
 		conn.Unscoped().Delete(address)
 	}
+}
+
+// assertIsAddressDeleted for checking delete functionalities
+func assertIsAddressDeleted(t *testing.T, conn *gorm.DB, addressId int) {
+	var addr Address
+	fetchResult := conn.Where("id = ?", addressId).First(&addr)
+	assert.Error(t, fetchResult.Error, "Deleting address failed")
+	assert.ErrorIs(t, fetchResult.Error, gorm.ErrRecordNotFound, "Deleting address failed")
 }
