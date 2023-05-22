@@ -39,6 +39,11 @@ func (a *AddressService) GetAllUserAddresses(userId int) ([]Address, error) {
 
 // CreateAddress for user and insert it in database
 func (a *AddressService) CreateAddress(userId, cityId int, address string) (*Address, error) {
+	cityExists := a.repo.CityExists(cityId)
+	if !cityExists {
+		return nil, CityNotFound
+	}
+
 	tmpAddr := &Address{
 		UserId:  userId,
 		CityId:  cityId,
@@ -57,6 +62,11 @@ func (a *AddressService) UpdateAddress(requestedId, addressId, cityId int, newAd
 
 	if err = authorization.SimpleFieldAuthorization(*address, userAddrAuthorizerField, requestedId, YouAreNotAllowed); err != nil {
 		return nil, err
+	}
+
+	cityExists := a.repo.CityExists(cityId)
+	if !cityExists {
+		return nil, CityNotFound
 	}
 
 	return a.repo.UpdateAddress(address, cityId, newAddress)

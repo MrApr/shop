@@ -61,7 +61,12 @@ func TestAddressService_CreateAddress(t *testing.T) {
 	userId := rand.Int()
 	mockedAddress := mockAddress(city[0].Id, userId)
 
+	_, err = service.CreateAddress(mockedAddress.UserId, rand.Int(), mockedAddress.Address)
+	assert.Error(t, err, "User address creation failed in address service")
+	assert.ErrorIs(t, err, CityNotFound, "User address creation failed in address service")
+
 	result, err := service.CreateAddress(mockedAddress.UserId, mockedAddress.CityId, mockedAddress.Address)
+	defer destructAddresses(conn, []Address{*result})
 	assert.NoError(t, err, "User address creation failed in address service")
 
 	assert.Equal(t, result.Address, mockedAddress.Address, "User address creation failed in address service")
@@ -88,6 +93,10 @@ func TestAddressService_UpdateAddress(t *testing.T) {
 	_, err = service.UpdateAddress(newWrongUserId, mockedAddresses[0].Id, cities[1].Id, newAddress)
 	assert.Error(t, err, "UserAddress service update functionality failed")
 	assert.ErrorIs(t, err, YouAreNotAllowed, "UserAddress service update functionality failed")
+
+	_, err = service.UpdateAddress(userId, mockedAddresses[0].Id, rand.Int(), newAddress)
+	assert.Error(t, err, "User address creation failed in address service")
+	assert.ErrorIs(t, err, CityNotFound, "User address creation failed in address service")
 
 	_, err = service.UpdateAddress(userId, rand.Int(), cities[1].Id, newAddress)
 	assert.Error(t, err, "UserAddress service update functionality failed")
