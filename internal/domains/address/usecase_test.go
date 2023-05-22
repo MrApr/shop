@@ -27,7 +27,21 @@ func TestAddressUseCase_GetAllCities(t *testing.T) {
 
 // TestAddressUseCase_GetAllUserAddresses functionality
 func TestAddressUseCase_GetAllUserAddresses(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	ctx := context.Background()
+	usecase := createUseCase(conn)
 
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := 1
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, userId, 2)
+	defer destructAddresses(conn, mockedAddresses)
+
+	result, err := usecase.GetAllUserAddresses(ctx, "")
+	assert.NoError(t, err, "Fetching all user addresses failed in user usecase")
+	assertAddresses(t, result, mockedAddresses)
 }
 
 // TestAddressUseCase_CreateAddress functionality

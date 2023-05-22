@@ -2,6 +2,7 @@ package address
 
 import (
 	"context"
+	"shop/pkg/advancedError"
 	"shop/pkg/userHandler"
 )
 
@@ -28,9 +29,14 @@ func (a *AddressUseCase) GetAllCities(ctx context.Context) ([]City, error) {
 	return a.sv.GetAllCities()
 }
 
-func (a *AddressUseCase) GetAllUserAddresses(ctx context.Context, userId int) ([]Address, error) {
-	//TODO implement me
-	panic("implement me")
+// GetAllUserAddresses by their user id and return it
+func (a *AddressUseCase) GetAllUserAddresses(ctx context.Context, token string) ([]Address, error) {
+	userId, err := a.decoderFn(ctx, token)
+	if err != nil {
+		return nil, advancedError.New(err, "Decoding token failed")
+	}
+
+	return a.sv.GetAllUserAddresses(userId)
 }
 
 func (a *AddressUseCase) CreateAddress(ctx context.Context, token string, request *CreateAddressRequest) (*Address, error) {

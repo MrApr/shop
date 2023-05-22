@@ -24,7 +24,7 @@ type AddressServiceInterface interface {
 // AddressUseCaseInterface defines set of methods that each type who wants to play role as address use-case should obey
 type AddressUseCaseInterface interface {
 	GetAllCities(ctx context.Context) ([]City, error)
-	GetAllUserAddresses(ctx context.Context, userId int) ([]Address, error)
+	GetAllUserAddresses(ctx context.Context, token string) ([]Address, error)
 	CreateAddress(ctx context.Context, token string, request *CreateAddressRequest) (*Address, error)
 	UpdateAddress(ctx context.Context, token string, request *UpdateAddressRequest) (*Address, error)
 	DeleteAddress(ctx context.Context, token string, request *DeleteAddressRequest) error
