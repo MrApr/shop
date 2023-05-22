@@ -26,9 +26,11 @@ func (a *AddressRepository) GetAddressById(id int) (*Address, error) {
 	panic("implement me")
 }
 
+// GetAllUserAddresses based by their user_id and return them
 func (a *AddressRepository) GetAllUserAddresses(userId int) ([]Address, error) {
-	//TODO implement me
-	panic("implement me")
+	var addresses []Address
+	result := a.db.Where("user_id = ?", userId).Find(&addresses)
+	return addresses, result.Error
 }
 
 func (a *AddressRepository) CreateAddress(address *Address) (*Address, error) {

@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"math/rand"
 	"testing"
 )
 
@@ -14,6 +15,7 @@ func TestAddressRepository_GetAllCities(t *testing.T) {
 	repo := createRepository(conn)
 
 	mockedCities := mockAndInsertCity(conn, 2)
+	defer destructCities(conn, mockedCities)
 
 	cities, err := repo.GetAllCities()
 	assert.NoError(t, err, "Fetching cities from repository failed")
@@ -24,7 +26,20 @@ func TestAddressRepository_GetAllCities(t *testing.T) {
 
 // TestAddressRepository_GetAllUserAddresses functionality
 func TestAddressRepository_GetAllUserAddresses(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
 
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := rand.Int()
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, userId, 2)
+	defer destructAddresses(conn, mockedAddresses)
+
+	result, err := repo.GetAllUserAddresses(userId)
+	assert.NoError(t, err, "Fetching all user addresses failed")
+	assertAddresses(t, result, mockedAddresses)
 }
 
 // TestAddressRepository_GetAddressById functionality
@@ -68,6 +83,36 @@ func createRepository(conn *gorm.DB) AddressRepositoryInterface {
 	return NewAddressRepository(conn)
 }
 
+// mockAndInsertAddresses into database and return them
+func mockAndInsertAddresses(db *gorm.DB, cityId, userId, count int) []Address {
+	var addresses []Address
+
+	for i := 0; i < count; i++ {
+		mockedAddress := mockAddress(cityId, userId)
+		result := db.Create(mockedAddress)
+		if result.Error != nil {
+			continue
+		}
+
+		addresses = append(addresses, *mockedAddress)
+	}
+
+	return addresses
+}
+
+// mockAddress and return it
+func mockAddress(cityId, userId int) *Address {
+	if userId == 0 {
+		userId = rand.Int()
+	}
+
+	return &Address{
+		UserId: userId,
+		//CityId:  cityId,
+		Address: "Test Address for user",
+	}
+}
+
 // mockCity struct and return it
 func mockCity() *City {
 	return &City{
@@ -81,7 +126,7 @@ func setupDbConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(City{})
+	err = db.AutoMigrate(City{}, Address{})
 	return db, err
 }
 
@@ -90,5 +135,29 @@ func assertCitiesEquivelance(t *testing.T, mockedCities, fetchedCities []City) {
 	for index := range mockedCities {
 		assert.Equal(t, mockedCities[index].Id, fetchedCities[index].Id)
 		assert.Equal(t, mockedCities[index].Title, fetchedCities[index].Title)
+	}
+}
+
+// assertAddresses to check whether they are equal or not
+func assertAddresses(t *testing.T, fetchedAddresses, mockedAddresses []Address) {
+	for index := range mockedAddresses {
+		assert.Equal(t, mockedAddresses[index].Id, fetchedAddresses[index].Id, "User addresses are not equal")
+		//assert.Equal(t, mockedAddresses[index].CityId, fetchedAddresses[index].CityId, "User addresses are not equal")
+		assert.Equal(t, mockedAddresses[index].UserId, fetchedAddresses[index].UserId, "User addresses are not equal")
+		assert.Equal(t, mockedAddresses[index].Address, fetchedAddresses[index].Address, "User addresses are not equal")
+	}
+}
+
+// destructCities which are created for testing purpose
+func destructCities(conn *gorm.DB, cities []City) {
+	for _, city := range cities {
+		conn.Unscoped().Delete(city)
+	}
+}
+
+// destructAddresses which are created for testing
+func destructAddresses(conn *gorm.DB, addresses []Address) {
+	for _, address := range addresses {
+		conn.Unscoped().Delete(address)
 	}
 }

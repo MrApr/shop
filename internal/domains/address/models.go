@@ -7,11 +7,16 @@ type Address struct {
 	Id        int        `json:"id" gorm:"primaryKey"`
 	UserId    int        `json:"-"`
 	CityId    int        `json:"city_id"`
-	City      City       `json:"city" gorm:"foreignKey:CityId;references:Id"`
+	City      *City      `json:"city,omitempty" gorm:"foreignKey:CityId;references:Id"`
 	Address   string     `json:"address"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdateAt  *time.Time `json:"update_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
+}
+
+// TableName overrides table name for gorm model
+func (Address) TableName() string {
+	return "user_addresses"
 }
 
 // City is a struct which contains city's entity fields
