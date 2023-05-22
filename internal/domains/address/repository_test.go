@@ -52,13 +52,30 @@ func TestAddressRepository_GetAddressById(t *testing.T) {
 	city := mockAndInsertCity(conn, 1)
 	defer destructCities(conn, city)
 
-	userId := rand.Int()
-	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, userId, 1)
+	mockedAddresses := mockAndInsertAddresses(conn, city[0].Id, 0, 1)
 	defer destructAddresses(conn, mockedAddresses)
 
 	result, err := repo.GetAddressById(mockedAddresses[0].Id)
 	assert.NoError(t, err, "Fetching Address by id failed")
 	assertAddresses(t, []Address{*result}, mockedAddresses)
+}
+
+// TestAddressRepository_CreateAddress functionality
+func TestAddressRepository_CreateAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	repo := createRepository(conn)
+
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := rand.Int()
+	mockedAddress := mockAddress(city[0].Id, userId)
+
+	result, err := repo.CreateAddress(mockedAddress)
+	destructAddresses(conn, []Address{*result})
+	assert.NoError(t, err, "User address creation failed")
+	assertAddresses(t, []Address{*mockedAddress}, []Address{*result})
 }
 
 // TestAddressRepository_UpdateAddress functionality
@@ -68,11 +85,6 @@ func TestAddressRepository_UpdateAddress(t *testing.T) {
 
 // TestAddressRepository_DeleteAddress functionality
 func TestAddressRepository_DeleteAddress(t *testing.T) {
-
-}
-
-// TestAddressRepository_CreateAddress functionality
-func TestAddressRepository_CreateAddress(t *testing.T) {
 
 }
 

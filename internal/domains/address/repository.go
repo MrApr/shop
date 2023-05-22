@@ -34,9 +34,10 @@ func (a *AddressRepository) GetAllUserAddresses(userId int) ([]Address, error) {
 	return addresses, result.Error
 }
 
+// CreateAddress for user and return it
 func (a *AddressRepository) CreateAddress(address *Address) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	result := a.db.Create(address)
+	return address, result.Error
 }
 
 func (a *AddressRepository) UpdateAddress(address *Address, cityId int, newAddress string) (*Address, error) {
