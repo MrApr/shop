@@ -32,9 +32,15 @@ func (a *AddressService) GetAllUserAddresses(userId int) ([]Address, error) {
 	return addresses, err
 }
 
+// CreateAddress for user and insert it in database
 func (a *AddressService) CreateAddress(userId, cityId int, address string) (*Address, error) {
-	//TODO implement me
-	panic("implement me")
+	tmpAddr := &Address{
+		UserId:  userId,
+		CityId:  cityId,
+		Address: address,
+	}
+
+	return a.repo.CreateAddress(tmpAddr)
 }
 
 func (a *AddressService) UpdateAddress(requestedId, addressId, cityId int, newAddress string) (*Address, error) {

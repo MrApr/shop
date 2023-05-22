@@ -51,7 +51,22 @@ func TestAddressService_GetAllUserAddresses(t *testing.T) {
 
 // TestAddressService_CreateAddress functionality
 func TestAddressService_CreateAddress(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Stablishing Database connection failed")
+	service := createAddressService(conn)
 
+	city := mockAndInsertCity(conn, 1)
+	defer destructCities(conn, city)
+
+	userId := rand.Int()
+	mockedAddress := mockAddress(city[0].Id, userId)
+
+	result, err := service.CreateAddress(mockedAddress.UserId, mockedAddress.CityId, mockedAddress.Address)
+	assert.NoError(t, err, "User address creation failed in address service")
+
+	assert.Equal(t, result.Address, mockedAddress.Address, "User address creation failed in address service")
+	assert.Equal(t, result.CityId, mockedAddress.CityId, "User address creation failed in address service")
+	assert.Equal(t, result.UserId, mockedAddress.UserId, "User address creation failed in address service")
 }
 
 // TestAddressService_UpdateAddress functionality
