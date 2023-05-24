@@ -18,6 +18,7 @@ func TestCategoryRepository_GetAllCategories(t *testing.T) {
 	defer destructCreatedCategories(db, createdCats)
 
 	fetchedCats := repo.GetAllCategories()
+	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
 	assertCategories(t, createdCats, fetchedCats)
 }
 
