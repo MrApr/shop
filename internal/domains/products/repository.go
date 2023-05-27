@@ -130,7 +130,7 @@ func (p *ProductRepository) GetAllProducts(categories []int, title, description 
 
 // GetProduct and return it based on passing id
 func (p *ProductRepository) GetProduct(id int) *Product {
-	var product Product
-	p.db.Preload("Categories").Where("id = ?", id).Find(&product)
-	return &product
+	product := new(Product)
+	p.db.Preload("Categories").Where("id = ?", id).First(product)
+	return product
 }
