@@ -26,7 +26,41 @@ func TestCategoriesUseCase_GetAllCategories(t *testing.T) {
 	assertCategories(t, createdCats, fetchedCategories)
 }
 
+// TestTypesUseCase_GetAllTypes functionality
+func TestTypesUseCase_GetAllTypes(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting database connection up failed")
+	testingObjectsCount := 5
+	ctx := context.Background()
+
+	uc := createTypeUseCase(conn)
+
+	mockedTypes := mockAndInsertType(conn, testingObjectsCount)
+	assert.Equal(t, len(mockedTypes), testingObjectsCount, "Creating Mock objects failed")
+	mockedRequest := mockGetAllTypesRequest()
+
+	fetchedTypes, err := uc.GetAllTypes(ctx, mockedRequest)
+	assert.NoError(t, err, "Fetching Types from type service:no error expected")
+	assert.Equal(t, len(fetchedTypes), testingObjectsCount, "Fetching Types from repo failed")
+	assertTypes(t, fetchedTypes, mockedTypes)
+}
+
 // createUseCase and return it for testing
 func createUseCase(db *gorm.DB) CategoryUseCaseInterface {
 	return NewCategoryUseCase(NewCategoryService(NewCategoryRepo(db)))
+}
+
+// createTypeUseCase and return it for testing purpose
+func createTypeUseCase(db *gorm.DB) TypeUseCaseInterface {
+	return NewTypeUseCase(NewTypeService(NewTypeRepo(db)))
+}
+
+// GetAllTypesRequest and return it
+func mockGetAllTypesRequest() *GetAllTypesRequest {
+	offset := 0
+	return &GetAllTypesRequest{
+		Name:   nil,
+		Limit:  5,
+		Offset: &offset,
+	}
 }
