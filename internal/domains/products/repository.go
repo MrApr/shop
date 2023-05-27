@@ -20,3 +20,8 @@ func (c *CategoryRepository) GetAllCategories() []Category {
 	c.db.Preload("Type").Find(&categories)
 	return categories
 }
+
+// TypesRepository implements type Repository interface
+type TypesRepository struct {
+	db *gorm.DB
+}

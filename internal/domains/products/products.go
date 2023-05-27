@@ -16,3 +16,18 @@ type CategoryServiceInterface interface {
 type CategoryUseCaseInterface interface {
 	GetAllCategories(ctx context.Context) ([]Category, error)
 }
+
+// TypeRepositoryInterface defines set of abstract methods for every type, who is going to be Type repository
+type TypeRepositoryInterface interface {
+	GetAllTypes(name *string, limit, offset int) []Type
+}
+
+// TypeServiceInterface defines set of abstract methods for every type who is going to be Type Service
+type TypeServiceInterface interface {
+	GetAllTypes(name *string, limit, offset int) ([]Type, error)
+}
+
+// TypeUseCaseInterface defines set of abstract methods for type use case, which every Type use case should implement it
+type TypeUseCaseInterface interface {
+	GetAllTypes(ctx context.Context, request *GetAllTypesRequest) ([]Type, error)
+}

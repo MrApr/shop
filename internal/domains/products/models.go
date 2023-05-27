@@ -11,6 +11,13 @@ type Type struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
+// GetAllTypesRequest is the struct which represents get all types request
+type GetAllTypesRequest struct {
+	Name   *string `json:"name,omitempty" validate:"omitempty,min=2,max=255"`
+	Limit  int     `json:"limit" validate:"required,gte=1"`
+	Offset *int    `json:"offset,omitempty" validate:"omitempty,min=0"`
+}
+
 // Category defines category entity in system
 type Category struct {
 	Id             int        `json:"id" gorm:"primaryKey"`
