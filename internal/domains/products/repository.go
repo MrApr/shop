@@ -45,7 +45,7 @@ func (t *TypeRepository) GetAllTypes(name *string, limit, offset int) []Type {
 	db := t.db
 
 	if name != nil {
-		db = db.Where("name LIKE %?%", name)
+		db = db.Where("name LIKE %?%", *name)
 	}
 
 	db.Limit(limit).Offset(offset).Find(&typesSlice)
