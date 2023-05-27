@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"log"
 	"testing"
 )
 
@@ -20,6 +21,30 @@ func TestCategoryRepository_GetAllCategories(t *testing.T) {
 	fetchedCats := repo.GetAllCategories()
 	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
 	assertCategories(t, createdCats, fetchedCats)
+}
+
+// TestTypeRepository_GetAllTypes functionality
+func TestTypeRepository_GetAllTypes(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	testingObjectCount := 5
+
+	repo := createTypeRepo(conn)
+
+	mockedTypes := mockAndInsertType(conn, testingObjectCount)
+	assert.Equal(t, len(mockedTypes), testingObjectCount, "Creating Mock objects failed")
+
+	fetchedTypes := repo.GetAllTypes(nil, testingObjectCount, 0)
+	assert.Equal(t, len(fetchedTypes), testingObjectCount, "Fetching Types from repo failed")
+	assertTypes(t, fetchedTypes, mockedTypes)
+
+	fetchedTypes = repo.GetAllTypes(nil, testingObjectCount, 10)
+	assert.Equal(t, len(fetchedTypes), 0, "Fetching Types from repo failed, on offset 10")
+
+	var wrongName string = "TestIrreleventname"
+	fetchedTypes = repo.GetAllTypes(&wrongName, testingObjectCount, 0)
+	assert.Equal(t, len(fetchedTypes), 0, "Fetching Types from repo failed, on offset 10")
 }
 
 // createCategoryRepository for testing purpose
@@ -60,6 +85,22 @@ func createTypeInDb(db *gorm.DB) *Type {
 	tmpType := mockType()
 	db.Create(tmpType)
 	return tmpType
+}
+
+// mockAndInsertType in temporary database
+func mockAndInsertType(conn *gorm.DB, count int) []Type {
+	types := make([]Type, 0, count)
+
+	for i := 0; i < count; i++ {
+		mockedType := mockType()
+		result := conn.Create(mockedType)
+		if result.Error != nil {
+			log.Println(result.Error)
+		}
+		types = append(types, *mockedType)
+	}
+
+	return types
 }
 
 // mockType struct for test
@@ -103,4 +144,17 @@ func destructCreatedCategories(db *gorm.DB, cats []Category) {
 // destructCreatedType and deleted it from DB
 func destructCreatedType(db *gorm.DB, typeId int) {
 	db.Unscoped().Delete(Type{}, typeId)
+}
+
+// createTypeRepo and return it for testing purpose
+func createTypeRepo(conn *gorm.DB) TypeRepositoryInterface {
+	return NewTypeRepo(conn)
+}
+
+// assertTypes to check whether they are equal or not !
+func assertTypes(t *testing.T, fetchedTypes, mockedTypes []Type) {
+	for index := range mockedTypes {
+		assert.Equal(t, fetchedTypes[index].Title, mockedTypes[index].Title, "Types are not equal")
+		assert.Equal(t, fetchedTypes[index].Id, mockedTypes[index].Id, "Types are not equal")
+	}
 }
