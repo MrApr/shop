@@ -77,6 +77,61 @@ func TestTypeRepository_GetAllTypes(t *testing.T) {
 	assert.Equal(t, len(fetchedTypes), 0, "Fetching Types from repo failed, on offset 10")
 }
 
+// TestProductRepository_GetAllProducts functionality
+func TestProductRepository_GetAllProducts(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	testingObjectCount := 5
+
+	repo := createProductRepository(conn)
+
+	mockedProducts := mockAndInsertProducts(conn, testingObjectCount)
+	assert.Equal(t, len(mockedProducts), testingObjectCount, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	fetchedProducts := repo.GetAllProducts([]int{rand.Int()}, nil, nil, nil, nil, nil, nil)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong category id failed")
+
+	wrongText := "wrong given title"
+	fetchedProducts = repo.GetAllProducts(nil, &wrongText, nil, nil, nil, nil, nil)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong title failed")
+
+	fetchedProducts = repo.GetAllProducts(nil, nil, &wrongText, nil, nil, nil, nil)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong description failed")
+
+	wrongInt := 50
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, &wrongInt, nil, nil, nil)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong weight failed")
+
+	wrongInt = 10
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, &wrongInt, nil, nil)
+	assert.Equal(t, 0, len(fetchedProducts), "Fetching products with wrong weight failed")
+
+	wrongPrice := 55.00
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, &wrongPrice, nil)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong price failed")
+
+	wrongPrice = 10.00
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, nil, &wrongPrice)
+	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong price failed")
+
+	correctMinWeight := 15
+	correctMaxWeight := 20
+	correctMinPrice := 12.5
+	correctMaxPrice := 20.00
+	fetchedProducts = repo.GetAllProducts([]int{mockedProducts[0].Categories[0].Id}, &mockedProducts[0].Title, nil, &correctMinWeight, &correctMaxWeight, &correctMinPrice, &correctMaxPrice)
+	assert.Equal(t, len(fetchedProducts), testingObjectCount, "Fetching products with correct data failed")
+	assertProducts(t, mockedProducts, fetchedProducts)
+}
+
+// TestProductRepository_GetProduct functionality
+func TestProductRepository_GetProduct(t *testing.T) {
+
+}
+
 // createCategoryRepository for testing purpose
 func createCategoryRepository(db *gorm.DB) CategoriesRepositoryInterface {
 	return NewCategoryRepo(db)
@@ -88,7 +143,7 @@ func setupDbConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(Type{}, Category{})
+	err = db.AutoMigrate(Type{}, Category{}, Product{})
 	return db, err
 }
 
@@ -126,6 +181,7 @@ func mockAndInsertType(conn *gorm.DB, count int) []Type {
 		result := conn.Create(mockedType)
 		if result.Error != nil {
 			log.Println(result.Error)
+			continue
 		}
 		types = append(types, *mockedType)
 	}
@@ -193,5 +249,68 @@ func assertTypes(t *testing.T, fetchedTypes, mockedTypes []Type) {
 func destructAllTypes(conn *gorm.DB, types []Type) {
 	for _, tmpType := range types {
 		conn.Unscoped().Delete(tmpType)
+	}
+}
+
+// createProductRepository and return it
+func createProductRepository(db *gorm.DB) ProductsRepositoryInterface {
+	return NewProductRepository(db)
+}
+
+// mockAndInsertProducts in database
+func mockAndInsertProducts(db *gorm.DB, count int) []Product {
+	cat := mockAndInsertCategories(db, 1)
+
+	products := make([]Product, 0, count)
+
+	for i := 0; i < count; i++ {
+		mockedProduct := mockProduct(cat[0])
+		result := db.Create(mockedProduct)
+		if result.Error != nil {
+			log.Println(result.Error)
+			continue
+		}
+
+		products = append(products, *mockedProduct)
+	}
+
+	return products
+}
+
+// mockProduct and return it for testing purpose
+func mockProduct(category Category) *Product {
+	randCode := rand.Int()
+	randAmount := rand.Int()
+	weight := 15
+	description := "Test description for you, Which I prepared"
+	return &Product{
+		Categories:  []Category{category},
+		Title:       "Test title",
+		Code:        randCode,
+		Amount:      randAmount,
+		Price:       12.5,
+		Weight:      &weight,
+		Description: &description,
+	}
+}
+
+// assertProducts in test operation
+func assertProducts(t *testing.T, mockedProducts, fetchedProducts []Product) {
+	for index := range mockedProducts {
+		assert.NotNil(t, fetchedProducts[index].Categories, "Fetched products doesnt have categories preloaded")
+		assert.Equal(t, mockedProducts[index].Id, fetchedProducts[index].Id, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Title, fetchedProducts[index].Title, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Code, fetchedProducts[index].Code, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Amount, fetchedProducts[index].Amount, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Price, fetchedProducts[index].Price, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Weight, fetchedProducts[index].Weight, "Fetched products are not equal")
+		assert.Equal(t, mockedProducts[index].Description, fetchedProducts[index].Description, "Fetched products are not equal")
+	}
+}
+
+// destructCreatedProducts that inserted during test
+func destructCreatedProducts(db *gorm.DB, products []Product) {
+	for _, product := range products {
+		db.Unscoped().Delete(product)
 	}
 }

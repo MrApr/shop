@@ -44,7 +44,7 @@ type GetAllCategoriesRequest struct {
 // Product represent product entity in system
 type Product struct {
 	Id          int        `json:"id" gorm:"primaryKey"`
-	Categories  []Category `json:"categories" gorm:"many2many:product_categories_table;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
+	Categories  []Category `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
 	Title       string     `json:"title" gorm:"index"`
 	Code        int        `json:"code" gorm:"uniqueIndex"`
 	Amount      int        `json:"amount"`
@@ -61,7 +61,7 @@ type GetAllProductsRequest struct {
 	CategoryIds []int    `json:"category_ids,omitempty" validate:"omitempty"`
 	Title       *string  `json:"title,omitempty" validate:"omitempty;min=3;max=255"`
 	MinWeight   *int     `json:"min_weight,omitempty" validate:"omitempty:min=1"`
-	HighWeight  *int     `json:"high_weight" validate:"omitempty;min=1;gtefield:MinWeight"`
+	maxWeight   *int     `json:"high_weight" validate:"omitempty;min=1;gtefield:MinWeight"`
 	MinPrice    *float64 `json:"min_price" validate:"omitempty:min=1"`
 	MaxPrice    *float64 `json:"max_price" validate:"omitempty:min=1;gtefield:MinPrice"`
 }

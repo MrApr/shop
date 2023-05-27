@@ -1,6 +1,8 @@
 package products
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 // CategoryRepository which implements repository interface of category
 type CategoryRepository struct {
@@ -9,6 +11,11 @@ type CategoryRepository struct {
 
 // TypeRepository implements TypeRepositoryInterface
 type TypeRepository struct {
+	db *gorm.DB
+}
+
+// ProductRepository implements ProductsRepositoryInterface
+type ProductRepository struct {
 	db *gorm.DB
 }
 
@@ -69,4 +76,56 @@ func (t *TypeRepository) GetAllTypes(name *string, limit, offset int) []Type {
 	db.Limit(limit).Offset(offset).Find(&typesSlice)
 
 	return typesSlice
+}
+
+// NewProductRepository and return it
+func NewProductRepository(db *gorm.DB) ProductsRepositoryInterface {
+	return &ProductRepository{
+		db: db,
+	}
+}
+
+// GetAllProducts and return them based on given arguments
+func (p *ProductRepository) GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64) []Product {
+	var products []Product
+	db := p.db.Preload("Categories")
+
+	if categories != nil {
+		db = db.Joins("JOIN product_categories ON product_categories.product_id = products.id").
+			Where("product_categories.category_id IN ?", categories)
+	}
+
+	if title != nil {
+		db = db.Where("title LIKE ?", *title)
+	}
+
+	if description != nil {
+		db = db.Where("description LIKE ?", *description)
+	}
+
+	if minWeight != nil {
+		db = db.Where("weight >= ?", *minWeight)
+	}
+
+	if maxWeight != nil {
+		db = db.Where("weight <= ?", *maxWeight)
+	}
+
+	if minPrice != nil {
+		db = db.Where("price >= ?", *minPrice)
+	}
+
+	if maxPrice != nil {
+		db = db.Where("price <= ?", *maxPrice)
+	}
+
+	db.Find(&products)
+
+	return products
+}
+
+// GetProduct and return it based on passing id
+func (p *ProductRepository) GetProduct(id int) *Product {
+	//TODO implement me
+	panic("implement me")
 }
