@@ -49,6 +49,47 @@ func TestTypesUseCase_GetAllTypes(t *testing.T) {
 	assertTypes(t, fetchedTypes, mockedTypes)
 }
 
+// TestProductUseCase_GetAllProducts functionality
+func TestProductUseCase_GetAllProducts(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+	ctx := context.Background()
+
+	testingObjectCount := 5
+
+	uc := createProductUseCase(conn)
+	mockedGetAllRequest := mockEmptyGetAllProductsRequest()
+
+	mockedProducts := mockAndInsertProducts(conn, testingObjectCount)
+	assert.Equal(t, len(mockedProducts), testingObjectCount, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	products, err := uc.GetAllProducts(ctx, mockedGetAllRequest)
+	assert.NoError(t, err, "Fetching products from service failed")
+	assertProducts(t, mockedProducts, products)
+}
+
+// TestProductUseCase_GetProduct functionality
+func TestProductUseCase_GetProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+	ctx := context.Background()
+
+	uc := createProductUseCase(conn)
+
+	mockedProducts := mockAndInsertProducts(conn, 1)
+	assert.Equal(t, len(mockedProducts), 1, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	product, err := uc.GetProduct(ctx, mockedProducts[0].Id)
+	assert.NotNil(t, product.Categories)
+	assertProducts(t, mockedProducts, []Product{*product})
+}
+
 // createUseCase and return it for testing
 func createUseCase(db *gorm.DB) CategoryUseCaseInterface {
 	return NewCategoryUseCase(NewCategoryService(NewCategoryRepo(db)))
@@ -57,6 +98,11 @@ func createUseCase(db *gorm.DB) CategoryUseCaseInterface {
 // createTypeUseCase and return it for testing purpose
 func createTypeUseCase(db *gorm.DB) TypeUseCaseInterface {
 	return NewTypeUseCase(NewTypeService(NewTypeRepo(db)))
+}
+
+// createProductUseCase and return it
+func createProductUseCase(db *gorm.DB) ProductUseCaseInterface {
+	return NewProductUseCase(NewProductsService(NewProductRepository(db)))
 }
 
 // GetAllTypesRequest and return it
@@ -75,6 +121,21 @@ func mockEmptyAllCategoriesRequest() *GetAllCategoriesRequest {
 		Title:       nil,
 		TypeId:      nil,
 		ParentCatId: nil,
+		Limit:       nil,
+		Offset:      0,
+	}
+}
+
+// mockEmptyGetAllProductsRequest for testing purpose
+func mockEmptyGetAllProductsRequest() *GetAllProductsRequest {
+	return &GetAllProductsRequest{
+		CategoryIds: nil,
+		Title:       nil,
+		Description: nil,
+		MinWeight:   nil,
+		MaxWeight:   nil,
+		MinPrice:    nil,
+		MaxPrice:    nil,
 		Limit:       nil,
 		Offset:      0,
 	}

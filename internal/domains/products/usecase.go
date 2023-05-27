@@ -12,6 +12,11 @@ type TypesUseCase struct {
 	sv TypeServiceInterface
 }
 
+// ProductUseCase is the type which implements Products use case interface
+type ProductUseCase struct {
+	sv ProductServiceInterface
+}
+
 // defaultOffset defines default starting point for requests
 const defaultOffset int = 0
 
@@ -42,4 +47,21 @@ func (t *TypesUseCase) GetAllTypes(ctx context.Context, request *GetAllTypesRequ
 	}
 
 	return t.sv.GetAllTypes(request.Name, request.Limit, offset)
+}
+
+// NewProductUseCase and return it
+func NewProductUseCase(sv ProductServiceInterface) ProductUseCaseInterface {
+	return &ProductUseCase{
+		sv: sv,
+	}
+}
+
+// GetAllProducts and return them
+func (p *ProductUseCase) GetAllProducts(ctx context.Context, request *GetAllProductsRequest) ([]Product, error) {
+	return p.sv.GetAllProducts(request.CategoryIds, request.Title, request.Description, request.MinWeight, request.MaxWeight, request.MinPrice, request.MaxPrice, request.Limit, request.Offset)
+}
+
+// GetProduct and return it based on given id
+func (p *ProductUseCase) GetProduct(ctx context.Context, id int) (*Product, error) {
+	return p.sv.GetProduct(id)
 }

@@ -47,5 +47,5 @@ type ProductServiceInterface interface {
 // ProductUseCaseInterface defines set of abstract methods for every type who wants to play role as Product service
 type ProductUseCaseInterface interface {
 	GetAllProducts(ctx context.Context, request *GetAllProductsRequest) ([]Product, error)
-	GetProduct(id int) (*Product, error)
+	GetProduct(ctx context.Context, id int) (*Product, error)
 }

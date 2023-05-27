@@ -60,6 +60,7 @@ type Product struct {
 type GetAllProductsRequest struct {
 	CategoryIds []int    `json:"category_ids,omitempty" validate:"omitempty"`
 	Title       *string  `json:"title,omitempty" validate:"omitempty;min=3;max=255"`
+	Description *string  `json:"description,omitempty"  validate:"omitempty;min=10;max=500"`
 	MinWeight   *int     `json:"min_weight,omitempty" validate:"omitempty:min=1"`
 	MaxWeight   *int     `json:"high_weigh,omitempty" validate:"omitempty;min=1;gtefield:MinWeight"`
 	MinPrice    *float64 `json:"min_price,omitempty" validate:"omitempty:min=1"`
