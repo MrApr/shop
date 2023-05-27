@@ -18,8 +18,8 @@ func NewCategoryService(repo CategoriesRepositoryInterface) CategoryServiceInter
 }
 
 // GetAllCategories and return them
-func (c *CategoryService) GetAllCategories() ([]Category, error) {
-	cats := c.repo.GetAllCategories()
+func (c *CategoryService) GetAllCategories(title *string, parentCatId, typeId, limit *int, offset int) ([]Category, error) {
+	cats := c.repo.GetAllCategories(title, parentCatId, typeId, limit, offset)
 	if len(cats) == 0 {
 		return nil, NoCategoriesFound
 	}

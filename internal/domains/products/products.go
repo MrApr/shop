@@ -4,17 +4,17 @@ import "context"
 
 // CategoriesRepositoryInterface defines set of abstract methods for every type, who is going to be Category Repository
 type CategoriesRepositoryInterface interface {
-	GetAllCategories() []Category
+	GetAllCategories(title *string, parentCatId, typeId, limit *int, offset int) []Category
 }
 
 // CategoryServiceInterface defines set of abstract methods for every type, who is going to be Category Service
 type CategoryServiceInterface interface {
-	GetAllCategories() ([]Category, error)
+	GetAllCategories(title *string, parentCatId, typeId, limit *int, offset int) ([]Category, error)
 }
 
 // CategoryUseCaseInterface defines set of abstract methods for every type, who is going to be Category Use-Case
 type CategoryUseCaseInterface interface {
-	GetAllCategories(ctx context.Context) ([]Category, error)
+	GetAllCategories(ctx context.Context, request *GetAllCategoriesRequest) ([]Category, error)
 }
 
 // TypeRepositoryInterface defines set of abstract methods for every type, who is going to be Type repository

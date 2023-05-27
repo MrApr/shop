@@ -20,9 +20,27 @@ func NewCategoryRepo(db *gorm.DB) CategoriesRepositoryInterface {
 }
 
 // GetAllCategories and return them
-func (c *CategoryRepository) GetAllCategories() []Category {
+func (c *CategoryRepository) GetAllCategories(title *string, parentCatId, typeId, limit *int, offset int) []Category {
 	var categories []Category
-	c.db.Preload("Type").Find(&categories)
+	db := c.db
+
+	if title != nil {
+		db = db.Where("title LIKE %?%", *title)
+	}
+
+	if parentCatId != nil {
+		db = db.Where("parent_cat_id = ?", *parentCatId)
+	}
+
+	if typeId != nil {
+		db = db.Where("type_id = ?", *typeId)
+	}
+
+	if limit != nil {
+		db = db.Limit(*limit)
+	}
+
+	db.Preload("Type").Offset(offset).Find(&categories)
 	return categories
 }
 

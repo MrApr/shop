@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
+	"math/rand"
 	"testing"
 )
 
@@ -14,11 +15,35 @@ func TestCategoryRepository_GetAllCategories(t *testing.T) {
 	assert.NoError(t, err, "Connecting to database failed")
 
 	repo := createCategoryRepository(db)
-	createdCats := mockAndInsertCategories(db, 2)
+	createdCats := mockAndInsertCategories(db, 5)
 	defer destructCreatedType(db, createdCats[0].TypeId)
 	defer destructCreatedCategories(db, createdCats)
 
-	fetchedCats := repo.GetAllCategories()
+	fetchedCats := repo.GetAllCategories(nil, nil, nil, nil, 10)
+	assert.Equal(t, len(fetchedCats), 0, "Zero categories must be fetched")
+
+	falseParentCatId := rand.Int()
+	fetchedCats = repo.GetAllCategories(nil, &falseParentCatId, nil, nil, 0)
+	assert.Equal(t, len(fetchedCats), 0, "Zero categories must be fetched")
+
+	falseTypeId := rand.Int()
+	fetchedCats = repo.GetAllCategories(nil, nil, &falseTypeId, nil, 0)
+	assert.Equal(t, len(fetchedCats), 0, "Zero categories must be fetched")
+
+	limit := 1
+	fetchedCats = repo.GetAllCategories(nil, nil, nil, &limit, 0)
+	assert.Equal(t, len(fetchedCats), limit, "one Category must be fetched")
+
+	falseTitle := "Test irrelevant category title which not exists"
+	fetchedCats = repo.GetAllCategories(&falseTitle, nil, nil, nil, 0)
+	assert.Equal(t, len(fetchedCats), 0, "zero Category must be fetched")
+
+	fetchedCats = repo.GetAllCategories(nil, nil, nil, nil, 0)
+	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
+	assert.Equal(t, len(fetchedCats), 5, "Fetched categories are not equal")
+	assertCategories(t, createdCats, fetchedCats)
+
+	fetchedCats = repo.GetAllCategories(nil, nil, &createdCats[0].TypeId, nil, 0)
 	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
 	assertCategories(t, createdCats, fetchedCats)
 }

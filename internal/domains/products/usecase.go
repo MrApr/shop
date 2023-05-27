@@ -23,8 +23,8 @@ func NewCategoryUseCase(sv CategoryServiceInterface) CategoryUseCaseInterface {
 }
 
 // GetAllCategories and return them
-func (c *CategoriesUseCase) GetAllCategories(ctx context.Context) ([]Category, error) {
-	return c.sv.GetAllCategories()
+func (c *CategoriesUseCase) GetAllCategories(ctx context.Context, request *GetAllCategoriesRequest) ([]Category, error) {
+	return c.sv.GetAllCategories(request.Title, request.ParentCatId, request.TypeId, request.Limit, request.Offset)
 }
 
 // NewTypeUseCase and return it

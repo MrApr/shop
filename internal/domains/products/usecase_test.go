@@ -14,14 +14,15 @@ func TestCategoriesUseCase_GetAllCategories(t *testing.T) {
 
 	ctx := context.Background()
 	uC := createUseCase(conn)
+	mockGetAllRequest := mockEmptyAllCategoriesRequest()
 
-	_, err = uC.GetAllCategories(ctx)
+	_, err = uC.GetAllCategories(ctx, mockGetAllRequest)
 	assert.Error(t, err, "Expected categories not found error")
 	assert.ErrorIs(t, err, NoCategoriesFound, "Expected categories not found error")
 
 	createdCats := mockAndInsertCategories(conn, 2)
 
-	fetchedCategories, err := uC.GetAllCategories(ctx)
+	fetchedCategories, err := uC.GetAllCategories(ctx, mockGetAllRequest)
 	assert.NoError(t, err, "Fetching Categories from db failed")
 	assertCategories(t, createdCats, fetchedCategories)
 }
@@ -62,5 +63,16 @@ func mockGetAllTypesRequest() *GetAllTypesRequest {
 		Name:   nil,
 		Limit:  5,
 		Offset: &offset,
+	}
+}
+
+// mockEmptyAllCategoriesRequest and return it for testing purpose
+func mockEmptyAllCategoriesRequest() *GetAllCategoriesRequest {
+	return &GetAllCategoriesRequest{
+		Title:       nil,
+		TypeId:      nil,
+		ParentCatId: nil,
+		Limit:       nil,
+		Offset:      0,
 	}
 }

@@ -31,3 +31,12 @@ type Category struct {
 	CreatedAt      *time.Time `json:"created_at,omitempty"`
 	UpdatedAt      *time.Time `json:"updated_at,omitempty"`
 }
+
+// GetAllCategoriesRequest is the struct which represents get all categories request
+type GetAllCategoriesRequest struct {
+	Title       *string `json:"title,omitempty" validate:"omitempty,min=3,max=255"`
+	TypeId      *int    `json:"typeId,omitempty" validate:"omitempty,min=1"`
+	ParentCatId *int    `json:"parent_cat_id,omitempty" validate:"omitempty,min=1"`
+	Limit       *int    `json:"limit" validate:"required,gte=1"`
+	Offset      int     `json:"offset" validate:"omitempty,min=0"`
+}

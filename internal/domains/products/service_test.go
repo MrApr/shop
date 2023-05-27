@@ -13,13 +13,13 @@ func TestCategoryService_GetAllCategories(t *testing.T) {
 
 	sv := createService(conn)
 
-	_, err = sv.GetAllCategories()
+	_, err = sv.GetAllCategories(nil, nil, nil, nil, 0)
 	assert.Error(t, err, "Expected categories not found error")
 	assert.ErrorIs(t, err, NoCategoriesFound, "Expected categories not found error")
 
 	createdCats := mockAndInsertCategories(conn, 2)
 
-	fetchedCategories, err := sv.GetAllCategories()
+	fetchedCategories, err := sv.GetAllCategories(nil, nil, nil, nil, 0)
 	assert.NoError(t, err, "Fetching Categories from db failed")
 	assertCategories(t, createdCats, fetchedCategories)
 }
