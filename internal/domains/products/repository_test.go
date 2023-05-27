@@ -46,6 +46,10 @@ func TestCategoryRepository_GetAllCategories(t *testing.T) {
 	fetchedCats = repo.GetAllCategories(nil, nil, &createdCats[0].TypeId, nil, 0)
 	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
 	assertCategories(t, createdCats, fetchedCats)
+
+	fetchedCats = repo.GetAllCategories(&createdCats[0].Title, nil, &createdCats[0].TypeId, nil, 0)
+	assert.NotZero(t, len(fetchedCats), "Zero categories fetched")
+	assertCategories(t, createdCats, fetchedCats)
 }
 
 // TestTypeRepository_GetAllTypes functionality

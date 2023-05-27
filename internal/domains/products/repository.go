@@ -25,7 +25,7 @@ func (c *CategoryRepository) GetAllCategories(title *string, parentCatId, typeId
 	db := c.db
 
 	if title != nil {
-		db = db.Where("title LIKE %?%", *title)
+		db = db.Where("title LIKE ?", *title)
 	}
 
 	if parentCatId != nil {
@@ -63,7 +63,7 @@ func (t *TypeRepository) GetAllTypes(name *string, limit, offset int) []Type {
 	db := t.db
 
 	if name != nil {
-		db = db.Where("name LIKE %?%", *name)
+		db = db.Where("name LIKE ?", *name)
 	}
 
 	db.Limit(limit).Offset(offset).Find(&typesSlice)
