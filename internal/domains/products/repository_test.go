@@ -129,7 +129,20 @@ func TestProductRepository_GetAllProducts(t *testing.T) {
 
 // TestProductRepository_GetProduct functionality
 func TestProductRepository_GetProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createProductRepository(conn)
+
+	mockedProducts := mockAndInsertProducts(conn, 1)
+	assert.Equal(t, len(mockedProducts), 1, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	product := repo.GetProduct(mockedProducts[0].Id)
+	assert.NotNil(t, product.Categories)
+	assertProducts(t, mockedProducts, []Product{*product})
 }
 
 // createCategoryRepository for testing purpose
