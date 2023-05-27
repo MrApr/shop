@@ -40,3 +40,28 @@ type GetAllCategoriesRequest struct {
 	Limit       *int    `json:"limit" validate:"required,gte=1"`
 	Offset      int     `json:"offset" validate:"omitempty,min=0"`
 }
+
+// Product represent product entity in system
+type Product struct {
+	Id          int        `json:"id" gorm:"primaryKey"`
+	Categories  []Category `json:"categories" gorm:"many2many:product_categories_table;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
+	Title       string     `json:"title" gorm:"index"`
+	Code        int        `json:"code" gorm:"uniqueIndex"`
+	Amount      int        `json:"amount"`
+	Price       float64    `json:"price" gorm:"index"`
+	Weight      *int       `json:"weight"`
+	Description *string    `json:"description"`
+	CreatedAt   *time.Time `json:"created_at,omitempty"`
+	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
+	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+}
+
+// GetAllProductsRequest and return them
+type GetAllProductsRequest struct {
+	CategoryIds []int    `json:"category_ids,omitempty" validate:"omitempty"`
+	Title       *string  `json:"title,omitempty" validate:"omitempty;min=3;max=255"`
+	MinWeight   *int     `json:"min_weight,omitempty" validate:"omitempty:min=1"`
+	HighWeight  *int     `json:"high_weight" validate:"omitempty;min=1;gtefield:MinWeight"`
+	MinPrice    *float64 `json:"min_price" validate:"omitempty:min=1"`
+	MaxPrice    *float64 `json:"max_price" validate:"omitempty:min=1;gtefield:MinPrice"`
+}

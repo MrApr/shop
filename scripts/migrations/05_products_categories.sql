@@ -1,4 +1,4 @@
-CREATE TABLE `product_categories_table`
+CREATE TABLE `product_categories`
 (
     `product_id`  INTEGER UNSIGNED NOT NULL,
     `category_id` INTEGER UNSIGNED NOT NULL,

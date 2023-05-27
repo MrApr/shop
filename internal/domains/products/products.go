@@ -31,3 +31,21 @@ type TypeServiceInterface interface {
 type TypeUseCaseInterface interface {
 	GetAllTypes(ctx context.Context, request *GetAllTypesRequest) ([]Type, error)
 }
+
+// ProductsRepositoryInterface defines set of abstract methods for every type who wants to play role as Product repository
+type ProductsRepositoryInterface interface {
+	GetAllProducts(categories []int, title, description *string, minWeight, highWeight *int, minPrice, highPrice *float64) []Product
+	GetProduct(id int) *Product
+}
+
+// ProductServiceInterface defines set of abstract methods for every type who wants to play role as Product service
+type ProductServiceInterface interface {
+	GetAllProducts(categories []int, title, description *string, minWeight, highWeight *int, minPrice, highPrice *float64) ([]Product, error)
+	GetProduct(id int) (*Product, error)
+}
+
+// ProductUseCaseInterface defines set of abstract methods for every type who wants to play role as Product service
+type ProductUseCaseInterface interface {
+	GetAllProducts(ctx context.Context, request *GetAllProductsRequest) ([]Product, error)
+	GetProduct(id int) (*Product, error)
+}
