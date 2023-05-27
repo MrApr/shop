@@ -21,6 +21,8 @@ func TestCategoriesUseCase_GetAllCategories(t *testing.T) {
 	assert.ErrorIs(t, err, NoCategoriesFound, "Expected categories not found error")
 
 	createdCats := mockAndInsertCategories(conn, 2)
+	defer destructCreatedType(conn, createdCats[0].TypeId)
+	defer destructCreatedCategories(conn, createdCats)
 
 	fetchedCategories, err := uC.GetAllCategories(ctx, mockGetAllRequest)
 	assert.NoError(t, err, "Fetching Categories from db failed")
@@ -37,6 +39,7 @@ func TestTypesUseCase_GetAllTypes(t *testing.T) {
 	uc := createTypeUseCase(conn)
 
 	mockedTypes := mockAndInsertType(conn, testingObjectsCount)
+	defer destructAllTypes(conn, mockedTypes)
 	assert.Equal(t, len(mockedTypes), testingObjectsCount, "Creating Mock objects failed")
 	mockedRequest := mockGetAllTypesRequest()
 

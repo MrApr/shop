@@ -18,6 +18,8 @@ func TestCategoryService_GetAllCategories(t *testing.T) {
 	assert.ErrorIs(t, err, NoCategoriesFound, "Expected categories not found error")
 
 	createdCats := mockAndInsertCategories(conn, 2)
+	defer destructCreatedType(conn, createdCats[0].TypeId)
+	defer destructCreatedCategories(conn, createdCats)
 
 	fetchedCategories, err := sv.GetAllCategories(nil, nil, nil, nil, 0)
 	assert.NoError(t, err, "Fetching Categories from db failed")
@@ -37,6 +39,7 @@ func TestTypeService_GetAllTypes(t *testing.T) {
 	assert.ErrorIs(t, err, NoTypesFound, "Fetching Types from type service: provided wrong error type")
 
 	mockedTypes := mockAndInsertType(conn, testingObjectsCount)
+	defer destructAllTypes(conn, mockedTypes)
 	assert.Equal(t, len(mockedTypes), testingObjectsCount, "Creating Mock objects failed")
 
 	fetchedTypes, err := sv.GetAllTypes(nil, testingObjectsCount, 0)

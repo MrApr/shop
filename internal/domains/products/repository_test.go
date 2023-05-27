@@ -62,6 +62,7 @@ func TestTypeRepository_GetAllTypes(t *testing.T) {
 	repo := createTypeRepo(conn)
 
 	mockedTypes := mockAndInsertType(conn, testingObjectCount)
+	defer destructAllTypes(conn, mockedTypes)
 	assert.Equal(t, len(mockedTypes), testingObjectCount, "Creating Mock objects failed")
 
 	fetchedTypes := repo.GetAllTypes(nil, testingObjectCount, 0)
@@ -185,5 +186,12 @@ func assertTypes(t *testing.T, fetchedTypes, mockedTypes []Type) {
 	for index := range mockedTypes {
 		assert.Equal(t, fetchedTypes[index].Title, mockedTypes[index].Title, "Types are not equal")
 		assert.Equal(t, fetchedTypes[index].Id, mockedTypes[index].Id, "Types are not equal")
+	}
+}
+
+// destructTypes which has been created in db
+func destructAllTypes(conn *gorm.DB, types []Type) {
+	for _, tmpType := range types {
+		conn.Unscoped().Delete(tmpType)
 	}
 }
