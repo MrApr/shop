@@ -86,7 +86,7 @@ func NewProductRepository(db *gorm.DB) ProductsRepositoryInterface {
 }
 
 // GetAllProducts and return them based on given arguments
-func (p *ProductRepository) GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64) []Product {
+func (p *ProductRepository) GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64, limit *int, offset int) []Product {
 	var products []Product
 	db := p.db.Preload("Categories")
 
@@ -119,7 +119,11 @@ func (p *ProductRepository) GetAllProducts(categories []int, title, description 
 		db = db.Where("price <= ?", *maxPrice)
 	}
 
-	db.Find(&products)
+	if limit != nil {
+		db = db.Limit(*limit)
+	}
+
+	db.Offset(offset).Find(&products)
 
 	return products
 }

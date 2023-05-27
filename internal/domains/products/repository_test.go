@@ -92,37 +92,44 @@ func TestProductRepository_GetAllProducts(t *testing.T) {
 	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
 	defer destructCreatedProducts(conn, mockedProducts)
 
-	fetchedProducts := repo.GetAllProducts([]int{rand.Int()}, nil, nil, nil, nil, nil, nil)
+	fetchedProducts := repo.GetAllProducts([]int{rand.Int()}, nil, nil, nil, nil, nil, nil, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong category id failed")
 
 	wrongText := "wrong given title"
-	fetchedProducts = repo.GetAllProducts(nil, &wrongText, nil, nil, nil, nil, nil)
+	fetchedProducts = repo.GetAllProducts(nil, &wrongText, nil, nil, nil, nil, nil, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong title failed")
 
-	fetchedProducts = repo.GetAllProducts(nil, nil, &wrongText, nil, nil, nil, nil)
+	fetchedProducts = repo.GetAllProducts(nil, nil, &wrongText, nil, nil, nil, nil, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong description failed")
 
 	wrongInt := 50
-	fetchedProducts = repo.GetAllProducts(nil, nil, nil, &wrongInt, nil, nil, nil)
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, &wrongInt, nil, nil, nil, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong weight failed")
 
 	wrongInt = 10
-	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, &wrongInt, nil, nil)
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, &wrongInt, nil, nil, nil, 0)
 	assert.Equal(t, 0, len(fetchedProducts), "Fetching products with wrong weight failed")
 
 	wrongPrice := 55.00
-	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, &wrongPrice, nil)
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, &wrongPrice, nil, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong price failed")
 
 	wrongPrice = 10.00
-	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, nil, &wrongPrice)
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, nil, &wrongPrice, nil, 0)
 	assert.Equal(t, len(fetchedProducts), 0, "Fetching products with wrong price failed")
+
+	oneLimit := 1
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, nil, nil, &oneLimit, 0)
+	assert.Equal(t, len(fetchedProducts), oneLimit, "Fetching products with one limit failed")
+
+	fetchedProducts = repo.GetAllProducts(nil, nil, nil, nil, nil, nil, nil, nil, 10)
+	assert.Equal(t, len(fetchedProducts), oneLimit, "Fetching products with wrong offset failed")
 
 	correctMinWeight := 15
 	correctMaxWeight := 20
 	correctMinPrice := 12.5
 	correctMaxPrice := 20.00
-	fetchedProducts = repo.GetAllProducts([]int{mockedProducts[0].Categories[0].Id}, &mockedProducts[0].Title, nil, &correctMinWeight, &correctMaxWeight, &correctMinPrice, &correctMaxPrice)
+	fetchedProducts = repo.GetAllProducts([]int{mockedProducts[0].Categories[0].Id}, &mockedProducts[0].Title, nil, &correctMinWeight, &correctMaxWeight, &correctMinPrice, &correctMaxPrice, nil, 0)
 	assert.Equal(t, len(fetchedProducts), testingObjectCount, "Fetching products with correct data failed")
 	assertProducts(t, mockedProducts, fetchedProducts)
 }
