@@ -12,7 +12,7 @@ type ContactUsServiceInterface interface {
 	CreateContactUs(title, email, description string) (*ContactUs, error)
 }
 
-// ContactUsUseCaseRepository defines set of method for every type who is contact us use-case
-type ContactUsUseCaseRepository interface {
+// ContactUsUseCaseInterface defines set of method for every type who is contact us use-case
+type ContactUsUseCaseInterface interface {
 	CreateContactUs(ctx context.Context, request *CreateContactUsRequest) (*ContactUs, error)
 }
