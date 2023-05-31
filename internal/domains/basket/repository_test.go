@@ -31,7 +31,25 @@ func TestSqlBasket_GetBasketById(t *testing.T) {
 
 // TestSqlBasket_GetUserActiveBasket functionality
 func TestSqlBasket_GetUserActiveBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+	testingCount := 1
+
+	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, false)
+	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
+
+	_, err = repo.GetUserActiveBasket(mockedBasked[0].Id)
+	assert.Error(t, err, "Fetching data from basket repository failed, no user active basket should exists")
+
+	mockedBasked = mockAndInsertBasket(conn, testingCount, randUserId, true)
+	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
+
+	result, err := repo.GetUserActiveBasket(randUserId)
+	assert.NoError(t, err, "Fetching data from basket repository failed, User should have active basket")
+	assertBasketsEqual(t, mockedBasked, []Basket{*result})
 }
 
 // TestSqlBasket_GetUserBaskets functionality

@@ -16,8 +16,9 @@ func NewBasketRepository(db *gorm.DB) BasketRepositoryInterface {
 
 // GetUserActiveBasket which has status true
 func (b *SqlBasket) GetUserActiveBasket(userId int) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	activeBasket := new(Basket)
+	result := b.db.Where("user_id = ?", userId).Where("status = ?", true).First(activeBasket)
+	return activeBasket, result.Error
 }
 
 // GetBasketById and return it
