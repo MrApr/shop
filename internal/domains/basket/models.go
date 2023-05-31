@@ -1,22 +1,23 @@
 package basket
 
 import (
+	"shop/internal/domains/products"
 	"time"
 )
 
 // Basket struct represent basket entity in system
 type Basket struct {
-	Id        int              `json:"id" gorm:"primaryKey"`
-	UserId    int              `json:"-"`
-	Status    bool             `json:"status" gorm:"index"`
-	Products  []BasketProducts `json:"products" gorm:"many2many:basket_products;foreignKey:Id;joinForeignKey:BasketId;References:Id;joinReferences:ProductId"`
-	CreatedAt *time.Time       `json:"created_at"`
-	UpdateAt  *time.Time       `json:"update_at"`
-	DeletedAt *time.Time       `json:"deleted_at"`
+	Id        int                `json:"id" gorm:"primaryKey"`
+	UserId    int                `json:"-"`
+	Status    bool               `json:"status" gorm:"index"`
+	Products  []products.Product `json:"products" gorm:"many2many:basket_products;foreignKey:Id;joinForeignKey:BasketId;References:Id;joinReferences:ProductId"`
+	CreatedAt *time.Time         `json:"created_at"`
+	UpdateAt  *time.Time         `json:"update_at"`
+	DeletedAt *time.Time         `json:"deleted_at"`
 }
 
-// BasketProducts is the struct which represents basket_products table
-type BasketProducts struct {
+// BasketProduct is the struct which represents basket_products table
+type BasketProduct struct {
 	BasketId  int     `json:"basket_id"`
 	ProductId int     `json:"product_id"`
 	Amount    int     `json:"amount"`

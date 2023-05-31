@@ -7,12 +7,13 @@ type BasketRepositoryInterface interface {
 	GetUserActiveBasket(userId int) (*Basket, error)
 	GetBasketById(id int) (*Basket, error)
 	GetUserBaskets(userId int) ([]Basket, error)
-	GetBasketProduct(basketId int, productId int) (*BasketProducts, error)
+	GetBasketProduct(basketId int, productId int) (*BasketProduct, error)
 	BasketExists(basketId int) bool
 	CreateBasket(userBasket *Basket) error
 	DisableBasket(userBasket *Basket) error
-	AddProductToBasket(userBasket *Basket, basketProduct *BasketProducts) error
-	UpdateBasketProducts(userBasket *Basket, basketProduct *BasketProducts) error
+	AddProductToBasket(userBasket *Basket, basketProduct *BasketProduct) error
+	UpdateBasketProducts(userBasket *Basket, basketProduct *BasketProduct) error
+	ClearBasketProducts(userBasket *Basket) error
 }
 
 // BasketServiceInterface defines set of methods that represent basket's service functionalities
