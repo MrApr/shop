@@ -1,6 +1,9 @@
 package basket
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"gorm.io/gorm"
+)
 
 // SqlBasket implements BasketRepositoryInterface
 type SqlBasket struct {
@@ -41,9 +44,13 @@ func (b *SqlBasket) GetBasketProduct(basketId int, productId int) (*BasketProduc
 	panic("implement me")
 }
 
+// BasketExists or not with given Id
 func (b *SqlBasket) BasketExists(basketId int) bool {
-	//TODO implement me
-	panic("implement me")
+	basket := new(Basket)
+
+	result := b.db.Where("id = ?", basketId).First(basket)
+
+	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
 func (b *SqlBasket) CreateBasket(userBasket *Basket) error {

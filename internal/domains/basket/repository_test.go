@@ -74,7 +74,22 @@ func TestSqlBasket_GetUserBaskets(t *testing.T) {
 
 // TestSqlBasket_BasketExists functionality
 func TestSqlBasket_BasketExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+	testingCount := 1
+
+	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
+
+	exists := repo.BasketExists(mockedBasked[0].Id)
+	assert.True(t, exists, "Fetching data from basket repository failed, basket exists")
+
+	randWrongId := rand.Int()
+	exists = repo.BasketExists(randWrongId)
+	assert.False(t, exists, "Fetching data from basket repository failed, Basket does not exists")
 }
 
 // TestSqlBasket_GetBasketProduct functionality
