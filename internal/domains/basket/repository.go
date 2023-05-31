@@ -24,16 +24,15 @@ func (b *SqlBasket) GetUserActiveBasket(userId int) (*Basket, error) {
 // GetBasketById and return it
 func (b *SqlBasket) GetBasketById(id int) (*Basket, error) {
 	basket := new(Basket)
-
 	result := b.db.Where("id = ?", id).First(basket)
-
 	return basket, result.Error
 }
 
 // GetUserBaskets that exists in system
 func (b *SqlBasket) GetUserBaskets(userId int) ([]Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	var userBaskets []Basket
+	result := b.db.Where("user_id = ?", userId).Find(&userBaskets)
+	return userBaskets, result.Error
 }
 
 // GetBasketProduct and return it for
