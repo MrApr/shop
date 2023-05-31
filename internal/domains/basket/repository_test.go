@@ -18,6 +18,7 @@ func TestSqlBasket_GetBasketById(t *testing.T) {
 	testingCount := 1
 
 	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	defer destructBasket(conn, mockedBasked)
 	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
 
 	result, err := repo.GetBasketById(mockedBasked[0].Id)
@@ -39,6 +40,7 @@ func TestSqlBasket_GetUserActiveBasket(t *testing.T) {
 	testingCount := 1
 
 	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, false)
+	defer destructBasket(conn, mockedBasked)
 	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
 
 	_, err = repo.GetUserActiveBasket(randUserId)
@@ -65,6 +67,7 @@ func TestSqlBasket_GetUserBaskets(t *testing.T) {
 	assert.Equal(t, len(baskets), 0, "Fetching data from basket repository failed, User doesnt have any basket")
 
 	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	defer destructBasket(conn, mockedBasked)
 	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
 
 	result, err := repo.GetUserBaskets(randUserId)
@@ -82,6 +85,7 @@ func TestSqlBasket_BasketExists(t *testing.T) {
 	testingCount := 1
 
 	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	defer destructBasket(conn, mockedBasked)
 	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket repository")
 
 	exists := repo.BasketExists(mockedBasked[0].Id)
@@ -99,7 +103,21 @@ func TestSqlBasket_GetBasketProduct(t *testing.T) {
 
 // TestSqlBasket_CreateBasket functionality
 func TestSqlBasket_CreateBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+
+	mockedBasket := mockBasket(randUserId, true)
+
+	err = repo.CreateBasket(mockedBasket)
+	defer destructBasket(conn, []Basket{*mockedBasket})
+	assert.NoError(t, err, "User basket creation failed")
+
+	fetchedBasket := new(Basket)
+	result := conn.Where("id = ?", mockedBasket.Id).First(fetchedBasket)
+	assert.NoError(t, result.Error, "Basket did not created properly")
 }
 
 // TestSqlBasket_UpdateBasketProducts functionality

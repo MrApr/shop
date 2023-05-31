@@ -53,9 +53,10 @@ func (b *SqlBasket) BasketExists(basketId int) bool {
 	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
+// CreateBasket and insert it in database
 func (b *SqlBasket) CreateBasket(userBasket *Basket) error {
-	//TODO implement me
-	panic("implement me")
+	result := b.db.Create(userBasket)
+	return result.Error
 }
 
 func (b *SqlBasket) DisableBasket(userBasket *Basket) error {
