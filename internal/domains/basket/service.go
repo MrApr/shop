@@ -1,7 +1,10 @@
 package basket
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"shop/internal/domains/products"
+	"shop/pkg/advancedError"
 )
 
 // BasketService is the type which implements BasketServiceInterface
@@ -28,9 +31,23 @@ func (b *BasketService) GetUserBaskets(userId int) ([]Basket, error) {
 	return b.basketRepo.GetUserBaskets(userId)
 }
 
+// CreateBasket for user and return it
 func (b *BasketService) CreateBasket(userId int) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	err := b.checkAndDisableActiveBasket(userId)
+	if err != nil {
+		return nil, advancedError.New(err, "Disabling active basket for user, in new basket creation failed")
+	}
+	newBasket := &Basket{
+		UserId: userId,
+		Status: true,
+	}
+
+	err = b.basketRepo.CreateBasket(newBasket)
+	if err != nil {
+		return nil, advancedError.New(err, "Creating new basket for user failed")
+	}
+
+	return newBasket, err
 }
 
 func (b *BasketService) DisableActiveBasket() error {
@@ -46,4 +63,15 @@ func (b *BasketService) AddProductsToBasket(productId, amount int) (*Basket, err
 func (b *BasketService) UpdateBasketProductsAmount(productId, amount int) (*Basket, error) {
 	//TODO implement me
 	panic("implement me")
+}
+
+// checkAndDisableActiveBasket for user in order to create a new one
+func (b *BasketService) checkAndDisableActiveBasket(userId int) error {
+	activeBasket, err := b.basketRepo.GetUserActiveBasket(userId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	err = b.basketRepo.DisableBasket(activeBasket)
+	return err
 }
