@@ -13,14 +13,14 @@ type BasketService struct {
 // NewBasketService and return it
 func NewBasketService(basketRepo BasketRepositoryInterface, productSv products.ProductServiceInterface) BasketServiceInterface {
 	return &BasketService{
-		basketRepo:     nil,
-		productService: nil,
+		basketRepo:     basketRepo,
+		productService: productSv,
 	}
 }
 
+// GetUserActiveBasket and return it based on its userId
 func (b *BasketService) GetUserActiveBasket(userId int) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	return b.basketRepo.GetUserActiveBasket(userId)
 }
 
 func (b *BasketService) GetUserBaskets(userId int) ([]Basket, error) {
