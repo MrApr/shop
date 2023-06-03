@@ -146,7 +146,34 @@ func TestSqlBasket_CreateBasket(t *testing.T) {
 
 // TestSqlBasket_UpdateBasketProducts functionality
 func TestSqlBasket_UpdateBasketProducts(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id)
+	defer destructBasketProduct(conn, mockedBasketProducts)
+	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
+
+	newProductId := rand.Int()
+	newAmount := rand.Int()
+	newPrice := rand.Float64()
+
+	mockedBasketProducts[0].ProductId = newProductId
+	mockedBasketProducts[0].Amount = newAmount
+	mockedBasketProducts[0].UnitPrice = newPrice
+
+	err = repo.UpdateBasketProducts(&mockedBasketProducts[0])
+	assert.NoError(t, err, "Updating basket product failed, expected no error")
+
+	tmpBasketProduct := new(BasketProduct)
+	result := conn.Where("basket_id = ?", mockedBasketProducts[0].BasketId).Where("product_id = ?", mockedBasketProducts[0].ProductId).First(tmpBasketProduct)
+	assert.NoError(t, result.Error, "Adding product to basket failed")
+	assertBasketProductsEqual(t, []BasketProduct{mockedBasketProducts[0]}, []BasketProduct{*tmpBasketProduct})
 }
 
 // TestSqlBasket_AddProductToBasket functionality

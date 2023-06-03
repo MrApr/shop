@@ -71,9 +71,9 @@ func (b *SqlBasket) AddProductToBasket(userBasket *Basket, basketProduct *Basket
 	return b.db.Create(basketProduct).Error
 }
 
-func (b *SqlBasket) UpdateBasketProducts(userBasket *Basket, basketProduct *BasketProduct) error {
-	//TODO implement me
-	panic("implement me")
+// UpdateBasketProducts which is already exists in database
+func (b *SqlBasket) UpdateBasketProducts(basketProduct *BasketProduct) error {
+	return b.db.Where("product_id = ?", basketProduct.ProductId).Where("basket_id = ?", basketProduct.BasketId).Save(basketProduct).Error
 }
 
 func (b *SqlBasket) ClearBasketProducts(userBasket *Basket) error {

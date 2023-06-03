@@ -12,7 +12,7 @@ type BasketRepositoryInterface interface {
 	CreateBasket(userBasket *Basket) error
 	DisableBasket(userBasket *Basket) error
 	AddProductToBasket(userBasket *Basket, basketProduct *BasketProduct) error
-	UpdateBasketProducts(userBasket *Basket, basketProduct *BasketProduct) error
+	UpdateBasketProducts(basketProduct *BasketProduct) error
 	ClearBasketProducts(userBasket *Basket) error
 }
 
