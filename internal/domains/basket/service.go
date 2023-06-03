@@ -55,9 +55,32 @@ func (b *BasketService) DisableUserActiveBasket(userId int) error {
 	return b.checkAndDisableActiveBasket(userId)
 }
 
-func (b *BasketService) AddProductsToBasket(productId, amount int) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+// AddProductsToBasket for user which has already an active basket
+func (b *BasketService) AddProductsToBasket(userId, productId, amount int) (*Basket, error) {
+	err := b.checkAndUpdateProductStack(productId, amount)
+	if err != nil {
+		return nil, err
+	}
+
+	activeBasket, err := b.getOrCreateUserActiveBasket(userId)
+	if err != nil {
+		return nil, advancedError.New(err, "Cannot create or get user active basket")
+	}
+
+	price := b.getProductPrice(productId)
+	basketProduct := b.createBasketProduct(productId, amount, price)
+
+	result := b.basketRepo.AddProductToBasket(activeBasket, basketProduct)
+	if result != nil {
+		return nil, err
+	}
+
+	basket, err := b.basketRepo.GetBasketById(activeBasket.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return basket, nil
 }
 
 func (b *BasketService) UpdateBasketProductsAmount(productId, amount int) (*Basket, error) {
@@ -74,4 +97,60 @@ func (b *BasketService) checkAndDisableActiveBasket(userId int) error {
 
 	err = b.basketRepo.DisableBasket(activeBasket)
 	return err
+}
+
+// getProductPrice and return it
+func (b *BasketService) getProductPrice(productId int) float64 {
+	product, _ := b.productService.GetProduct(productId)
+	return product.Price
+}
+
+// checkAndUpdateProductStack
+func (b *BasketService) checkAndUpdateProductStack(productId, amount int) error {
+	product, err := b.productService.GetProduct(productId)
+	if err != nil {
+		return err
+	}
+
+	if err = b.checkProductStack(product.Amount, amount); err != nil {
+		return err
+	}
+
+	product, err = b.productService.UpdateProductInventory(productId, amount)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// checkProductStack and see whether it's enough or not
+func (b *BasketService) checkProductStack(amount, requestedAmount int) error {
+	switch {
+	case amount == 0:
+		return ProductIsFinished
+	case amount < requestedAmount:
+		return InsufficientProductAmount
+	default:
+		return nil
+	}
+}
+
+// getOrCreateUserActiveBasket is a wrapper for simplifying code
+func (b *BasketService) getOrCreateUserActiveBasket(userId int) (*Basket, error) {
+	basket, err := b.GetUserActiveBasket(userId)
+	if err == nil && basket.Id != 0 {
+		return basket, nil
+	}
+
+	return b.CreateBasket(userId)
+}
+
+// createBasketProduct and return it after initializing it
+func (b *BasketService) createBasketProduct(productId, amount int, price float64) *BasketProduct {
+	return &BasketProduct{
+		ProductId: productId,
+		Amount:    amount,
+		UnitPrice: price,
+	}
 }

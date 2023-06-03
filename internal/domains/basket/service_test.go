@@ -80,7 +80,32 @@ func TestBasketService_CreateBasket(t *testing.T) {
 
 // TestBasketService_AddProductsToBasket functionality
 func TestBasketService_AddProductsToBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	service := createBasketService(conn)
+	randUserId := rand.Int()
+
+	insufficientProduct := mockAndInsertProducts(conn, 0)
+	defer destructCreatedProduct(conn, insufficientProduct)
+	_, err = service.AddProductsToBasket(randUserId, insufficientProduct.Id, 1)
+	assert.Error(t, err, "Product inventory is insufficient, expected error")
+	assert.ErrorIs(t, err, ProductIsFinished, "product inventory is empty, expected ProductIsFinished error")
+
+	okProduct := mockAndInsertProducts(conn, 2)
+	defer destructCreatedProduct(conn, okProduct)
+
+	_, err = service.AddProductsToBasket(randUserId, okProduct.Id, 5)
+	assert.Error(t, err, "Product inventory is lower than expected, expected error")
+	assert.ErrorIs(t, err, InsufficientProductAmount, "product amount is insufficient, expected insufficient error")
+
+	tmpBasket, err := service.AddProductsToBasket(randUserId, okProduct.Id, 2)
+	assert.NoError(t, err, "Cannot add product to basket")
+	assert.NotNil(t, tmpBasket, "Expected basket, but got nil")
+	assert.Equal(t, tmpBasket.UserId, randUserId, "Basket is not correct for current user")
+	assert.True(t, tmpBasket.Status, "Product is added to a basket with false status")
+	assert.NotNil(t, tmpBasket.Products, "product is not added to basket")
+	assert.Equal(t, tmpBasket.Products[0].Id, okProduct.Id, "Added product and expected product are not equal")
 }
 
 // TestBasketService_DisableActiveBasket functionality
@@ -101,7 +126,6 @@ func TestBasketService_DisableActiveBasket(t *testing.T) {
 	result := conn.Where("id = ?", mockedBasket[0].Id).First(disabledBasket)
 	assert.NoError(t, result.Error, "Fetching basket in basket service failed")
 	assert.False(t, disabledBasket.Status, "Basket service disabling basket functionality failed")
-
 }
 
 // TestBasketService_UpdateBasketProductsAmount functionality
@@ -119,4 +143,26 @@ func createBasketService(db *gorm.DB) BasketServiceInterface {
 // BasketService service is tightly coupled with ProductService
 func createProductService(db *gorm.DB) products.ProductServiceInterface {
 	return products.NewProductsService(products.NewProductRepository(db))
+}
+
+// mockAndInsertProducts into database
+func mockAndInsertProducts(db *gorm.DB, amount int) *products.Product {
+	randCode := rand.Int()
+	randPrice := rand.Float64()
+
+	p := &products.Product{
+		Title:  "Test product",
+		Code:   randCode,
+		Amount: amount,
+		Price:  randPrice,
+	}
+
+	db.Create(p)
+
+	return p
+}
+
+// destructCreatedProduct for testing purpose
+func destructCreatedProduct(db *gorm.DB, createdProduct *products.Product) {
+	db.Unscoped().Delete(createdProduct)
 }
