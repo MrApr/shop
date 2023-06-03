@@ -152,6 +152,40 @@ func TestProductRepository_GetProduct(t *testing.T) {
 	assertProducts(t, mockedProducts, []Product{*product})
 }
 
+// TestProductRepository_UpdateProduct functionality
+func TestProductRepository_UpdateProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	repo := createProductRepository(conn)
+
+	mockedProducts := mockAndInsertProducts(conn, 1)
+	assert.Equal(t, len(mockedProducts), 1, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	newAmount := rand.Int()
+	newTitle := "new test title for update"
+	newCode := rand.Int()
+	newWeight := rand.Int()
+
+	mockedProducts[0].Amount = newAmount
+	mockedProducts[0].Weight = &newWeight
+	mockedProducts[0].Code = newCode
+	mockedProducts[0].Title = newTitle
+
+	err = repo.UpdateProduct(&mockedProducts[0])
+	assert.NoError(t, err, "product update failed")
+
+	tmpProduct := new(Product)
+	conn.Where("id = ?", mockedProducts[0].Id).First(tmpProduct)
+	assert.Equal(t, tmpProduct.Amount, newAmount, "product update failed")
+	assert.Equal(t, *tmpProduct.Weight, newWeight, "product update failed")
+	assert.Equal(t, tmpProduct.Title, newTitle, "product update failed")
+	assert.Equal(t, tmpProduct.Code, newCode, "product update failed")
+}
+
 // createCategoryRepository for testing purpose
 func createCategoryRepository(db *gorm.DB) CategoriesRepositoryInterface {
 	return NewCategoryRepo(db)

@@ -36,12 +36,14 @@ type TypeUseCaseInterface interface {
 type ProductsRepositoryInterface interface {
 	GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64, limit *int, offset int) []Product
 	GetProduct(id int) *Product
+	UpdateProduct(product *Product) error
 }
 
 // ProductServiceInterface defines set of abstract methods for every type who wants to play role as Product service
 type ProductServiceInterface interface {
 	GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64, limit *int, offset int) ([]Product, error)
 	GetProduct(id int) (*Product, error)
+	UpdateProductInventory(productId, newInventory int) (*Product, error)
 }
 
 // ProductUseCaseInterface defines set of abstract methods for every type who wants to play role as Product service

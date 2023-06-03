@@ -134,3 +134,8 @@ func (p *ProductRepository) GetProduct(id int) *Product {
 	p.db.Preload("Categories").Where("id = ?", id).First(product)
 	return product
 }
+
+// UpdateProduct which is already exists
+func (p *ProductRepository) UpdateProduct(product *Product) error {
+	return p.db.Save(product).Error
+}
