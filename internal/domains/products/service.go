@@ -73,3 +73,19 @@ func (p *ProductService) GetProduct(id int) (*Product, error) {
 
 	return product, nil
 }
+
+// UpdateProductInventory with new amount of that
+func (p *ProductService) UpdateProductInventory(productId, newInventory int) (*Product, error) {
+	product := p.repo.GetProduct(productId)
+	if product.Id == 0 {
+		return nil, ProductNotFound
+	}
+	product.Amount = newInventory
+
+	updateResult := p.repo.UpdateProduct(product)
+	if updateResult != nil {
+		return nil, updateResult
+	}
+
+	return product, nil
+}

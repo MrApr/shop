@@ -96,6 +96,34 @@ func TestProductService_GetProduct(t *testing.T) {
 	assert.ErrorIs(t, err, ProductNotFound, "Fetching Product failed with wrong id")
 }
 
+// TestProductService_UpdateProductInventory functionality
+func TestProductService_UpdateProductInventory(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	testingObjectCount := 5
+
+	sv := createProductService(conn)
+
+	randFailId := rand.Int()
+
+	_, err = sv.UpdateProductInventory(randFailId, 2)
+	assert.Error(t, err, "Fetching products from service failed")
+	assert.ErrorIs(t, err, ProductNotFound, "Fetching products from service failed")
+
+	mockedProducts := mockAndInsertProducts(conn, testingObjectCount)
+	assert.Equal(t, len(mockedProducts), testingObjectCount, "Mocking products failed")
+	defer destructCreatedType(conn, mockedProducts[0].Categories[0].TypeId)
+	defer destructCreatedCategories(conn, mockedProducts[0].Categories)
+	defer destructCreatedProducts(conn, mockedProducts)
+
+	newInventory := rand.Int()
+	updatedProduct, err := sv.UpdateProductInventory(mockedProducts[0].Id, newInventory)
+	assert.NoError(t, err, "product service updating product failed")
+	assert.Equal(t, updatedProduct.Amount, newInventory, "product service updating product failed")
+	assert.Equal(t, updatedProduct.Id, mockedProducts[0].Id, "product service updating product failed")
+}
+
 // createService and return it for testing purpose
 func createService(db *gorm.DB) CategoryServiceInterface {
 	return NewCategoryService(NewCategoryRepo(db))
