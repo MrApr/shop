@@ -50,9 +50,9 @@ func (b *BasketService) CreateBasket(userId int) (*Basket, error) {
 	return newBasket, err
 }
 
-func (b *BasketService) DisableActiveBasket() error {
-	//TODO implement me
-	panic("implement me")
+// DisableUserActiveBasket which is already inserted and present in database
+func (b *BasketService) DisableUserActiveBasket(userId int) error {
+	return b.checkAndDisableActiveBasket(userId)
 }
 
 func (b *BasketService) AddProductsToBasket(productId, amount int) (*Basket, error) {

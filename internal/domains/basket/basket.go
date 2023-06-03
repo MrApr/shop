@@ -21,7 +21,7 @@ type BasketServiceInterface interface {
 	GetUserActiveBasket(userId int) (*Basket, error)
 	GetUserBaskets(userId int) ([]Basket, error)
 	CreateBasket(userId int) (*Basket, error)
-	DisableActiveBasket() error
+	DisableUserActiveBasket(userId int) error
 	AddProductsToBasket(productId, amount int) (*Basket, error)        //Todo should fetch product price from Product domain
 	UpdateBasketProductsAmount(productId, amount int) (*Basket, error) //Todo should fetch product price from Product domain
 }

@@ -67,6 +67,7 @@ func TestBasketService_CreateBasket(t *testing.T) {
 	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket service")
 
 	createdBasket, err := service.CreateBasket(randUserId)
+	defer destructBasket(conn, []Basket{*createdBasket})
 	assert.NoError(t, err, "User basket Creation failed in user service")
 	assert.NotEqual(t, createdBasket.Id, mockedBasked[0].Id, "Previous basket is not disabled in basket service basket creation")
 
@@ -84,6 +85,22 @@ func TestBasketService_AddProductsToBasket(t *testing.T) {
 
 // TestBasketService_DisableActiveBasket functionality
 func TestBasketService_DisableActiveBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
+
+	service := createBasketService(conn)
+	randUserId := rand.Int()
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	err = service.DisableUserActiveBasket(randUserId)
+	assert.NoError(t, err, "Disabling basket failed")
+
+	disabledBasket := new(Basket)
+	result := conn.Where("id = ?", mockedBasket[0].Id).First(disabledBasket)
+	assert.NoError(t, result.Error, "Fetching basket in basket service failed")
+	assert.False(t, disabledBasket.Status, "Basket service disabling basket functionality failed")
 
 }
 
