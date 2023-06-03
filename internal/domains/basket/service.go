@@ -23,9 +23,9 @@ func (b *BasketService) GetUserActiveBasket(userId int) (*Basket, error) {
 	return b.basketRepo.GetUserActiveBasket(userId)
 }
 
+// GetUserBaskets and return them based on their Id
 func (b *BasketService) GetUserBaskets(userId int) ([]Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	return b.basketRepo.GetUserBaskets(userId)
 }
 
 func (b *BasketService) CreateBasket(userId int) (*Basket, error) {

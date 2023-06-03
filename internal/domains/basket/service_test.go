@@ -34,7 +34,23 @@ func TestBasketService_GetUserActiveBasket(t *testing.T) {
 
 // TestBasketService_GetUserBaskets functionality
 func TestBasketService_GetUserBaskets(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	service := createBasketService(conn)
+	randUserId := rand.Int()
+	testingCount := 5
+
+	baskets, err := service.GetUserBaskets(randUserId)
+	assert.Equal(t, len(baskets), 0, "Fetching data from basket service failed, User doesnt have any basket")
+
+	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	defer destructBasket(conn, mockedBasked)
+	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket service")
+
+	result, err := service.GetUserBaskets(randUserId)
+	assert.NoError(t, err, "Fetching data from basket service failed, User should have baskets")
+	assertBasketsEqual(t, mockedBasked, result)
 }
 
 // TestBasketService_CreateBasket functionality
