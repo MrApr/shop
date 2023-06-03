@@ -65,9 +65,10 @@ func (b *SqlBasket) DisableBasket(userBasket *Basket) error {
 	panic("implement me")
 }
 
+// AddProductToBasket which is already doesn't exist
 func (b *SqlBasket) AddProductToBasket(userBasket *Basket, basketProduct *BasketProduct) error {
-	//TODO implement me
-	panic("implement me")
+	basketProduct.BasketId = userBasket.Id
+	return b.db.Create(basketProduct).Error
 }
 
 func (b *SqlBasket) UpdateBasketProducts(userBasket *Basket, basketProduct *BasketProduct) error {
