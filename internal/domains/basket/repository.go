@@ -40,8 +40,9 @@ func (b *SqlBasket) GetUserBaskets(userId int) ([]Basket, error) {
 
 // GetBasketProduct and return it for
 func (b *SqlBasket) GetBasketProduct(basketId int, productId int) (*BasketProduct, error) {
-	//TODO implement me
-	panic("implement me")
+	basketProduct := new(BasketProduct)
+	result := b.db.Where("basket_id = ?", basketId).Where("product_id = ?", productId).First(basketProduct)
+	return basketProduct, result.Error
 }
 
 // BasketExists or not with given Id

@@ -98,7 +98,31 @@ func TestSqlBasket_BasketExists(t *testing.T) {
 
 // TestSqlBasket_GetBasketProduct functionality
 func TestSqlBasket_GetBasketProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+	testingCount := 1
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, testingCount, mockedBasket[0].Id)
+	defer destructBasketProduct(conn, mockedBasketProducts)
+	assert.Equal(t, len(mockedBasketProducts), testingCount, "Mocking basket products failed")
+
+	result, err := repo.GetBasketProduct(mockedBasket[0].Id, mockedBasketProducts[0].ProductId)
+	assert.NoError(t, err, "fetching basket product failed")
+	assertBasketProductsEqual(t, mockedBasketProducts, []BasketProduct{*result})
+
+	randWrongBasketId := rand.Int()
+	result, err = repo.GetBasketProduct(randWrongBasketId, mockedBasketProducts[0].ProductId)
+	assert.Error(t, err, "Expected error on wrong basket Id")
+
+	randWrongProductId := rand.Int()
+	result, err = repo.GetBasketProduct(mockedBasket[0].Id, randWrongProductId)
+	assert.Error(t, err, "Expected error on wrong basket Id")
 }
 
 // TestSqlBasket_CreateBasket functionality
@@ -183,10 +207,46 @@ func mockBasket(userId int, status bool) *Basket {
 	}
 }
 
+// mockAndInsertBasketProduct and return them
+func mockAndInsertBasketProduct(db *gorm.DB, count, basketId int) []BasketProduct {
+	basketProducts := make([]BasketProduct, 0, count)
+
+	for i := 0; i < count; i++ {
+		mockedBasketProduct := mockBasketProduct(basketId)
+		result := db.Create(mockedBasketProduct)
+		if result.Error != nil {
+			continue
+		}
+		basketProducts = append(basketProducts, *mockedBasketProduct)
+	}
+
+	return basketProducts
+}
+
+// mockBasketProduct and return it
+func mockBasketProduct(basketId int) *BasketProduct {
+	productId := rand.Int()
+	amount := rand.Int()
+	price := rand.Float64()
+	return &BasketProduct{
+		BasketId:  basketId,
+		ProductId: productId,
+		Amount:    amount,
+		UnitPrice: price,
+	}
+}
+
 // destructBasket which are created for test
 func destructBasket(db *gorm.DB, baskets []Basket) {
 	for _, basket := range baskets {
 		db.Unscoped().Delete(basket)
+	}
+}
+
+// destructBasketProduct and delete them
+func destructBasketProduct(db *gorm.DB, basketProducts []BasketProduct) {
+	for _, basketProduct := range basketProducts {
+		db.Where("basket_id = ?", basketProduct.BasketId).Where("product_id = ?", basketProduct.ProductId).Delete(basketProduct)
 	}
 }
 
@@ -196,5 +256,15 @@ func assertBasketsEqual(t *testing.T, mockedBaskets, fetchedBaskets []Basket) {
 		assert.Equal(t, mockedBaskets[index].Id, fetchedBaskets[index].Id, "Mocked and fetched baskets are not equal")
 		assert.Equal(t, mockedBaskets[index].UserId, fetchedBaskets[index].UserId, "Mocked and fetched baskets are not equal")
 		assert.Equal(t, mockedBaskets[index].Status, fetchedBaskets[index].Status, "Mocked and fetched baskets are not equal")
+	}
+}
+
+// assertBasketProductsEqual or not
+func assertBasketProductsEqual(t *testing.T, mockedBaskedProducts, fetchedBasketProducts []BasketProduct) {
+	for index := range mockedBaskedProducts {
+		assert.Equal(t, mockedBaskedProducts[index].BasketId, fetchedBasketProducts[index].BasketId)
+		assert.Equal(t, mockedBaskedProducts[index].ProductId, fetchedBasketProducts[index].ProductId)
+		assert.Equal(t, mockedBaskedProducts[index].Amount, fetchedBasketProducts[index].Amount)
+		assert.Equal(t, mockedBaskedProducts[index].UnitPrice, fetchedBasketProducts[index].UnitPrice)
 	}
 }

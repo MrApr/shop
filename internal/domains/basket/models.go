@@ -24,6 +24,11 @@ type BasketProduct struct {
 	UnitPrice float64 `json:"unit_price"`
 }
 
+// TableName overrides default table name in gorm for them
+func (*BasketProduct) TableName() string {
+	return "basket_products"
+}
+
 // AddProductsToBasketRequest is the struct which represents add request
 type AddProductsToBasketRequest struct {
 	ProductId int `json:"product_id" validate:"required,min=1"`
