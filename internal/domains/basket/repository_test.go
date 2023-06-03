@@ -225,7 +225,18 @@ func TestSqlBasket_ClearBasketProducts(t *testing.T) {
 
 // TestSqlBasket_DisableBasket functionality
 func TestSqlBasket_DisableBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	err = repo.DisableBasket(&mockedBasket[0])
+	assert.NoError(t, err, "Disabling basket failed")
+	assert.False(t, mockedBasket[0].Status, "Disabling basket failed")
 }
 
 // createRepo and return it

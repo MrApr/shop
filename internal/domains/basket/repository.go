@@ -60,9 +60,10 @@ func (b *SqlBasket) CreateBasket(userBasket *Basket) error {
 	return result.Error
 }
 
+// DisableBasket by making it's Status false
 func (b *SqlBasket) DisableBasket(userBasket *Basket) error {
-	//TODO implement me
-	panic("implement me")
+	userBasket.Status = false
+	return b.db.Save(userBasket).Error
 }
 
 // AddProductToBasket which is already doesn't exist
