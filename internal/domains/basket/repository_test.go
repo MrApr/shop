@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"math/rand"
+	"shop/internal/domains/products"
 	"testing"
 )
 
@@ -250,7 +251,7 @@ func setupDbConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(Basket{}, BasketProduct{})
+	err = db.AutoMigrate(Basket{}, BasketProduct{}, products.Product{})
 	return db, err
 }
 

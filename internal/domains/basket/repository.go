@@ -27,7 +27,7 @@ func (b *SqlBasket) GetUserActiveBasket(userId int) (*Basket, error) {
 // GetBasketById and return it
 func (b *SqlBasket) GetBasketById(id int) (*Basket, error) {
 	basket := new(Basket)
-	result := b.db.Where("id = ?", id).First(basket)
+	result := b.db.Preload("Products").Where("id = ?", id).First(basket)
 	return basket, result.Error
 }
 
