@@ -201,7 +201,26 @@ func TestSqlBasket_AddProductToBasket(t *testing.T) {
 
 // TestSqlBasket_ClearBasketProducts functionality
 func TestSqlBasket_ClearBasketProducts(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createRepo(conn)
+	randUserId := rand.Int()
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id)
+	defer destructBasketProduct(conn, mockedBasketProducts)
+	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
+
+	err = repo.ClearBasketProducts(&mockedBasket[0])
+	assert.NoError(t, err, "Clearing basket products failed")
+
+	var tmpBasketProducts []BasketProduct
+	result := conn.Where("basket_id = ?", mockedBasket[0].Id).Find(&tmpBasketProducts)
+	assert.NoError(t, result.Error, "Clearing products from basket failed")
+	assert.Equal(t, len(tmpBasketProducts), 0, "Clearing products from basket failed")
 }
 
 // TestSqlBasket_DisableBasket functionality
