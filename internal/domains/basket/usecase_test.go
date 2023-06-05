@@ -126,7 +126,23 @@ func TestBasketUseCase_UpdateBasketProductsAmount(t *testing.T) {
 
 // TestBasketUseCase_DisableActiveBasket functionality
 func TestBasketUseCase_DisableActiveBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	uC := createBasketUseCase(conn)
+	ctx := context.Background()
+	randUserId := 1
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	err = uC.DisableActiveBasket(ctx, "")
+	assert.NoError(t, err, "Disabling basket failed")
+
+	disabledBasket := new(Basket)
+	result := conn.Where("id = ?", mockedBasket[0].Id).First(disabledBasket)
+	assert.NoError(t, result.Error, "Fetching basket in basket service failed")
+	assert.False(t, disabledBasket.Status, "Basket service disabling basket functionality failed")
 }
 
 // createBasketUseCase and return it

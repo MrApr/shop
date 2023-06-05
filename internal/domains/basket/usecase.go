@@ -55,8 +55,12 @@ func (b *BasketUseCase) CreateBasket(ctx context.Context, token string) (*Basket
 
 // DisableActiveBasket and which already exists in db
 func (b *BasketUseCase) DisableActiveBasket(ctx context.Context, token string) error {
-	//TODO implement me
-	panic("implement me")
+	userId, err := b.decoderFn(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	return b.sv.DisableUserActiveBasket(userId)
 }
 
 // AddProductsToBasket and return general basket
