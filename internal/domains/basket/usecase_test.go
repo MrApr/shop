@@ -27,7 +27,21 @@ func TestBasketUseCase_GetUserActiveBasket(t *testing.T) {
 
 // TestBasketUseCase_GetUserBaskets functionality
 func TestBasketUseCase_GetUserBaskets(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	uc := createBasketUseCase(conn)
+	ctx := context.Background()
+	randUserId := 1
+	testingCount := 5
+
+	mockedBasked := mockAndInsertBasket(conn, testingCount, randUserId, true)
+	defer destructBasket(conn, mockedBasked)
+	assert.Equal(t, len(mockedBasked), testingCount, "Created basket and required basket are not equal in Testing basket service")
+
+	result, err := uc.GetUserBaskets(ctx, "")
+	assert.NoError(t, err, "Fetching data from basket service failed, User should have baskets")
+	assertBasketsEqual(t, mockedBasked, result)
 }
 
 // TestBasketUseCase_CreateBasket functionality

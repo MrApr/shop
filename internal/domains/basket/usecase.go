@@ -35,8 +35,12 @@ func (b *BasketUseCase) GetUserActiveBasket(ctx context.Context, token string) (
 
 // GetUserBaskets and return them
 func (b *BasketUseCase) GetUserBaskets(ctx context.Context, token string) ([]Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := b.decoderFn(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.sv.GetUserBaskets(userId)
 }
 
 // CreateBasket and store it in db then return it
