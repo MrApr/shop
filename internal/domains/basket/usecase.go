@@ -1,1 +1,60 @@
 package basket
+
+import (
+	"context"
+	"shop/pkg/userHandler"
+)
+
+// BasketUseCase is the struct which implements BasketUseCaseInterface
+type BasketUseCase struct {
+	sv        BasketServiceInterface
+	decoderFn func(ctx context.Context, token string) (int, error)
+}
+
+// NewUseCase creates and returns basket use case
+func NewUseCase(sv BasketServiceInterface, decoderFn func(ctx context.Context, token string) (int, error)) BasketUseCaseInterface {
+	if decoderFn == nil {
+		decoderFn = userHandler.ExtractUserIdFromToken
+	}
+
+	return &BasketUseCase{
+		sv:        sv,
+		decoderFn: decoderFn,
+	}
+}
+
+// GetUserActiveBasket and return it
+func (b *BasketUseCase) GetUserActiveBasket(ctx context.Context, token string) (*Basket, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// GetUserBaskets and return them
+func (b *BasketUseCase) GetUserBaskets(ctx context.Context, token string) ([]Basket, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// CreateBasket and store it in db then return it
+func (b *BasketUseCase) CreateBasket(ctx context.Context, token string) (*Basket, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// DisableActiveBasket and which already exists in db
+func (b *BasketUseCase) DisableActiveBasket(ctx context.Context, token string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+// AddProductsToBasket and return general basket
+func (b *BasketUseCase) AddProductsToBasket(ctx context.Context, token string, request *AddProductsToBasketRequest) (*Basket, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+// UpdateBasketProductsAmount and return them
+func (b *BasketUseCase) UpdateBasketProductsAmount(ctx context.Context, token string, request *EditProductsToBasketRequest) (*Basket, error) {
+	//TODO implement me
+	panic("implement me")
+}
