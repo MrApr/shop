@@ -25,8 +25,12 @@ func NewUseCase(sv BasketServiceInterface, decoderFn func(ctx context.Context, t
 
 // GetUserActiveBasket and return it
 func (b *BasketUseCase) GetUserActiveBasket(ctx context.Context, token string) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := b.decoderFn(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.sv.GetUserActiveBasket(userId)
 }
 
 // GetUserBaskets and return them
