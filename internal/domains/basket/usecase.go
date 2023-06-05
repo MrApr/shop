@@ -61,8 +61,12 @@ func (b *BasketUseCase) DisableActiveBasket(ctx context.Context, token string) e
 
 // AddProductsToBasket and return general basket
 func (b *BasketUseCase) AddProductsToBasket(ctx context.Context, token string, request *AddProductsToBasketRequest) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := b.decoderFn(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.sv.AddProductsToBasket(userId, request.ProductId, request.Amount)
 }
 
 // UpdateBasketProductsAmount and return them

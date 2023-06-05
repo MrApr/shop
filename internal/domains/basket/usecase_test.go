@@ -72,7 +72,25 @@ func TestBasketUseCase_CreateBasket(t *testing.T) {
 
 // TestBasketUseCase_AddProductsToBasket functionality
 func TestBasketUseCase_AddProductsToBasket(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	ctx := context.Background()
+	useCase := createBasketUseCase(conn)
+	randUserId := 1
+
+	okProduct := mockAndInsertProducts(conn, 2)
+	defer destructCreatedProduct(conn, okProduct)
+
+	mockedAddRequest := mockAddProductToBasketRequest(okProduct.Id, 2)
+
+	tmpBasket, err := useCase.AddProductsToBasket(ctx, "", mockedAddRequest)
+	assert.NoError(t, err, "Cannot add product to basket")
+	assert.NotNil(t, tmpBasket, "Expected basket, but got nil")
+	assert.Equal(t, tmpBasket.UserId, randUserId, "Basket is not correct for current user")
+	assert.True(t, tmpBasket.Status, "Product is added to a basket with false status")
+	assert.NotNil(t, tmpBasket.Products, "product is not added to basket")
+	assert.Equal(t, tmpBasket.Products[0].Id, okProduct.Id, "Added product and expected product are not equal")
 }
 
 // TestBasketUseCase_UpdateBasketProductsAmount functionality
@@ -91,4 +109,12 @@ func createBasketUseCase(db *gorm.DB) BasketUseCaseInterface {
 	return NewUseCase(sv, func(ctx context.Context, token string) (int, error) {
 		return 1, nil
 	})
+}
+
+// mockAddProductToBasketRequest and return it
+func mockAddProductToBasketRequest(productId, amount int) *AddProductsToBasketRequest {
+	return &AddProductsToBasketRequest{
+		ProductId: productId,
+		Amount:    amount,
+	}
 }
