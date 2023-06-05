@@ -95,7 +95,33 @@ func TestBasketUseCase_AddProductsToBasket(t *testing.T) {
 
 // TestBasketUseCase_UpdateBasketProductsAmount functionality
 func TestBasketUseCase_UpdateBasketProductsAmount(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	useCase := createBasketUseCase(conn)
+	ctx := context.Background()
+	randUserId := 1
+
+	okProduct := mockAndInsertProducts(conn, 2)
+	defer destructCreatedProduct(conn, okProduct)
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	productAmountInBasket := okProduct.Amount - 1
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id, okProduct.Id, productAmountInBasket)
+	defer destructBasketProduct(conn, mockedBasketProducts)
+	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
+
+	mockedEditAmountRequest := mockEditProductInBasketRequest(okProduct.Id, 2)
+	updatedBasketProduct, err := useCase.UpdateBasketProductsAmount(ctx, "", mockedEditAmountRequest)
+	assert.NoError(t, err, "Updating basket products failed")
+	assert.Equal(t, updatedBasketProduct.Products[0].Id, okProduct.Id)
+
+	basketProduct := new(BasketProduct)
+	fetchResult := conn.Where("product_id = ?", mockedBasketProducts[0].ProductId).Where("basket_id = ?", mockedBasketProducts[0].BasketId).First(basketProduct)
+	assert.NoError(t, fetchResult.Error, "fetching basket product failed")
+	assert.Equal(t, basketProduct.Amount, 2, "Updating basket products failed")
 }
 
 // TestBasketUseCase_DisableActiveBasket functionality
@@ -114,6 +140,14 @@ func createBasketUseCase(db *gorm.DB) BasketUseCaseInterface {
 // mockAddProductToBasketRequest and return it
 func mockAddProductToBasketRequest(productId, amount int) *AddProductsToBasketRequest {
 	return &AddProductsToBasketRequest{
+		ProductId: productId,
+		Amount:    amount,
+	}
+}
+
+// mockEditProductInBasketRequest and return it
+func mockEditProductInBasketRequest(productId, amount int) *EditProductsToBasketRequest {
+	return &EditProductsToBasketRequest{
 		ProductId: productId,
 		Amount:    amount,
 	}

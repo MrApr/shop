@@ -71,6 +71,10 @@ func (b *BasketUseCase) AddProductsToBasket(ctx context.Context, token string, r
 
 // UpdateBasketProductsAmount and return them
 func (b *BasketUseCase) UpdateBasketProductsAmount(ctx context.Context, token string, request *EditProductsToBasketRequest) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+	userId, err := b.decoderFn(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return b.sv.UpdateBasketProductsAmount(userId, request.ProductId, request.Amount)
 }
