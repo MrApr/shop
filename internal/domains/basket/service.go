@@ -83,9 +83,36 @@ func (b *BasketService) AddProductsToBasket(userId, productId, amount int) (*Bas
 	return basket, nil
 }
 
-func (b *BasketService) UpdateBasketProductsAmount(productId, amount int) (*Basket, error) {
-	//TODO implement me
-	panic("implement me")
+// UpdateBasketProductsAmount which is already in basket
+func (b *BasketService) UpdateBasketProductsAmount(userId, productId, amount int) (*Basket, error) {
+	activeBasket, err := b.basketRepo.GetUserActiveBasket(userId)
+	if err != nil {
+		return nil, NoActiveBasket
+	}
+
+	productBasket, err := b.basketRepo.GetBasketProduct(activeBasket.Id, productId)
+	if err != nil {
+		return nil, err
+	}
+
+	remainingAmount := b.calculateRemainingRequiredAmount(productBasket.Amount, amount)
+
+	err = b.checkAndUpdateProductStack(productId, remainingAmount)
+	if err != nil {
+		return nil, err
+	}
+
+	productBasket.Amount = amount
+	err = b.basketRepo.UpdateBasketProducts(productBasket)
+	if err != nil {
+		return nil, advancedError.New(err, "Updating product basket failed")
+	}
+
+	basket, err := b.basketRepo.GetBasketById(activeBasket.Id)
+	if err != nil {
+		return nil, err
+	}
+	return basket, nil
 }
 
 // checkAndDisableActiveBasket for user in order to create a new one
@@ -116,7 +143,8 @@ func (b *BasketService) checkAndUpdateProductStack(productId, amount int) error 
 		return err
 	}
 
-	product, err = b.productService.UpdateProductInventory(productId, amount)
+	leftAmount := product.Amount - amount
+	product, err = b.productService.UpdateProductInventory(productId, leftAmount)
 	if err != nil {
 		return err
 	}
@@ -153,4 +181,13 @@ func (b *BasketService) createBasketProduct(productId, amount int, price float64
 		Amount:    amount,
 		UnitPrice: price,
 	}
+}
+
+// calculateRemainingRequiredAmount and return it for updating usage
+func (b *BasketService) calculateRemainingRequiredAmount(basketAmount, requiredAmount int) int {
+	if basketAmount >= requiredAmount {
+		return basketAmount - requiredAmount
+	}
+
+	return requiredAmount - basketAmount
 }

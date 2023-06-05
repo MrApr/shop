@@ -130,7 +130,39 @@ func TestBasketService_DisableActiveBasket(t *testing.T) {
 
 // TestBasketService_UpdateBasketProductsAmount functionality
 func TestBasketService_UpdateBasketProductsAmount(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	service := createBasketService(conn)
+	randUserId := rand.Int()
+
+	okProduct := mockAndInsertProducts(conn, 2)
+	defer destructCreatedProduct(conn, okProduct)
+
+	_, err = service.UpdateBasketProductsAmount(randUserId, okProduct.Id, 5)
+	assert.Error(t, err, "Expected error, when no active basket for user exists")
+	assert.ErrorIs(t, err, NoActiveBasket, "Expected error, when no active basket for user exists")
+
+	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
+	defer destructBasket(conn, mockedBasket)
+
+	productAmountInBasket := okProduct.Amount - 1
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id, okProduct.Id, productAmountInBasket)
+	defer destructBasketProduct(conn, mockedBasketProducts)
+	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
+
+	_, err = service.UpdateBasketProductsAmount(randUserId, okProduct.Id, 5)
+	assert.Error(t, err, "Adding much more than products amount should cause and throw error")
+	assert.ErrorIs(t, err, InsufficientProductAmount, "Adding much more than products amount should cause and throw error")
+
+	updatedBasketProduct, err := service.UpdateBasketProductsAmount(randUserId, okProduct.Id, 2)
+	assert.NoError(t, err, "Updating basket products failed")
+	assert.Equal(t, updatedBasketProduct.Products[0].Id, okProduct.Id)
+
+	basketProduct := new(BasketProduct)
+	fetchResult := conn.Where("product_id = ?", mockedBasketProducts[0].ProductId).Where("basket_id = ?", mockedBasketProducts[0].BasketId).First(basketProduct)
+	assert.NoError(t, fetchResult.Error, "fetching basket product failed")
+	assert.Equal(t, basketProduct.Amount, 2, "Updating basket products failed")
 }
 
 // createBasketService and return it for testing purpose

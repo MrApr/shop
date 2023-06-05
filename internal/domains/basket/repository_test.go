@@ -109,7 +109,7 @@ func TestSqlBasket_GetBasketProduct(t *testing.T) {
 	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
 	defer destructBasket(conn, mockedBasket)
 
-	mockedBasketProducts := mockAndInsertBasketProduct(conn, testingCount, mockedBasket[0].Id)
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, testingCount, mockedBasket[0].Id, 0, 0)
 	defer destructBasketProduct(conn, mockedBasketProducts)
 	assert.Equal(t, len(mockedBasketProducts), testingCount, "Mocking basket products failed")
 
@@ -156,7 +156,7 @@ func TestSqlBasket_UpdateBasketProducts(t *testing.T) {
 	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
 	defer destructBasket(conn, mockedBasket)
 
-	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id)
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id, 0, 0)
 	defer destructBasketProduct(conn, mockedBasketProducts)
 	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
 
@@ -188,7 +188,7 @@ func TestSqlBasket_AddProductToBasket(t *testing.T) {
 	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
 	defer destructBasket(conn, mockedBasket)
 
-	mockedBasketProduct := mockBasketProduct(mockedBasket[0].Id)
+	mockedBasketProduct := mockBasketProduct(mockedBasket[0].Id, 0, 0)
 
 	err = repo.AddProductToBasket(&mockedBasket[0], mockedBasketProduct)
 	defer destructBasketProduct(conn, []BasketProduct{*mockedBasketProduct})
@@ -211,7 +211,7 @@ func TestSqlBasket_ClearBasketProducts(t *testing.T) {
 	mockedBasket := mockAndInsertBasket(conn, 1, randUserId, true)
 	defer destructBasket(conn, mockedBasket)
 
-	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id)
+	mockedBasketProducts := mockAndInsertBasketProduct(conn, 1, mockedBasket[0].Id, 0, 0)
 	defer destructBasketProduct(conn, mockedBasketProducts)
 	assert.Equal(t, len(mockedBasketProducts), 1, "Mocking basket products failed")
 
@@ -284,11 +284,11 @@ func mockBasket(userId int, status bool) *Basket {
 }
 
 // mockAndInsertBasketProduct and return them
-func mockAndInsertBasketProduct(db *gorm.DB, count, basketId int) []BasketProduct {
+func mockAndInsertBasketProduct(db *gorm.DB, count, basketId, productId, amount int) []BasketProduct {
 	basketProducts := make([]BasketProduct, 0, count)
 
 	for i := 0; i < count; i++ {
-		mockedBasketProduct := mockBasketProduct(basketId)
+		mockedBasketProduct := mockBasketProduct(basketId, productId, amount)
 		result := db.Create(mockedBasketProduct)
 		if result.Error != nil {
 			continue
@@ -300,9 +300,15 @@ func mockAndInsertBasketProduct(db *gorm.DB, count, basketId int) []BasketProduc
 }
 
 // mockBasketProduct and return it
-func mockBasketProduct(basketId int) *BasketProduct {
-	productId := rand.Int()
-	amount := rand.Int()
+func mockBasketProduct(basketId, productId, amount int) *BasketProduct {
+	if productId == 0 {
+		productId = rand.Int()
+	}
+
+	if amount == 0 {
+		amount = rand.Int()
+	}
+
 	price := rand.Float64()
 	return &BasketProduct{
 		BasketId:  basketId,
