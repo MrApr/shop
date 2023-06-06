@@ -3,6 +3,7 @@ package discount
 import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+	"math/rand"
 	"testing"
 )
 
@@ -36,7 +37,25 @@ func TestDiscountService_GetDiscountByCode(t *testing.T) {
 
 // TestDiscountService_GetDiscountByCode functionality
 func TestDiscountService_GetDiscountById(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "setting up database connection failed")
+	testingObjCounts := 1
 
+	sv := createDiscountService(db)
+
+	mockedDiscounts := mockAndInsertDiscountCodes(db, testingObjCounts)
+	defer destructDiscountCodes(db, mockedDiscounts)
+	assert.Equal(t, len(mockedDiscounts), testingObjCounts, "Initializing discount codes mocked objects failed !Required amounts and created amounts are not equal")
+
+	randWrongId := rand.Int()
+	_, err = sv.GetDiscountById(randWrongId)
+	assert.Error(t, err, "Expected error on fetching discount with wrong id")
+	assert.ErrorIs(t, err, DiscountNotFound, "Expected error on fetching discount with wrong id")
+
+	result, err := sv.GetDiscountById(mockedDiscounts[0].Id)
+	assert.NoError(t, err, "Fetching all discounts from discount service failed")
+
+	assertDiscountCodes(t, mockedDiscounts, []DiscountCode{*result})
 }
 
 // createDiscountService and return it

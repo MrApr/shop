@@ -24,8 +24,12 @@ func (d *DiscountService) GetAllDiscounts(from, to int) ([]DiscountCode, error) 
 
 // GetDiscountById and return it if any exists
 func (d *DiscountService) GetDiscountById(id int) (*DiscountCode, error) {
-	//TODO implement me
-	panic("implement me")
+	discount := d.repo.GetDiscountById(id)
+	if discount.Id == 0 {
+		return nil, DiscountNotFound
+	}
+
+	return discount, nil
 }
 
 // GetDiscountByCode and return it if any exists
