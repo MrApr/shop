@@ -29,7 +29,18 @@ func TestDiscountRepository_GetAllDiscounts(t *testing.T) {
 
 // TestDiscountRepository_GetDiscountByCode functionality
 func TestDiscountRepository_GetDiscountByCode(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "setting up database connection failed")
 
+	testingObjCounts := 1
+
+	repo := createRepository(db)
+	mockedDiscounts := mockAndInsertDiscountCodes(db, testingObjCounts)
+	defer destructDiscountCodes(db, mockedDiscounts)
+	assert.Equal(t, len(mockedDiscounts), testingObjCounts, "Initializing discount codes mocked objects failed !Required amounts and created amounts are not equal")
+
+	result := repo.GetDiscountByCode(mockedDiscounts[0].Code)
+	assertDiscountCodes(t, mockedDiscounts, []DiscountCode{*result})
 }
 
 // TestDiscountRepository_GetDiscountById functionality

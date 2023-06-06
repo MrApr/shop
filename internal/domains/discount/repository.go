@@ -30,6 +30,7 @@ func (d *DiscountRepository) GetDiscountById(id int) *DiscountCode {
 
 // GetDiscountByCode and return it
 func (d *DiscountRepository) GetDiscountByCode(code string) *DiscountCode {
-	//TODO implement me
-	panic("implement me")
+	discount := new(DiscountCode)
+	d.db.Where("code = ?", code).First(discount)
+	return discount
 }
