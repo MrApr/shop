@@ -49,7 +49,21 @@ func TestDiscountUseCase_GetDiscountByCode(t *testing.T) {
 
 // TestDiscountUseCase_GetDiscountById functionality
 func TestDiscountUseCase_GetDiscountById(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "setting up database connection failed")
+	testingObjCounts := 1
 
+	uC := createDiscountUseCase(db)
+	ctx := context.Background()
+
+	mockedDiscounts := mockAndInsertDiscountCodes(db, testingObjCounts)
+	defer destructDiscountCodes(db, mockedDiscounts)
+	assert.Equal(t, len(mockedDiscounts), testingObjCounts, "Initializing discount codes mocked objects failed !Required amounts and created amounts are not equal")
+
+	result, err := uC.GetDiscountById(ctx, mockedDiscounts[0].Id)
+	assert.NoError(t, err, "Fetching all discounts from discount service failed")
+
+	assertDiscountCodes(t, mockedDiscounts, []DiscountCode{*result})
 }
 
 // createDiscountUseCase and return it for testing purpose

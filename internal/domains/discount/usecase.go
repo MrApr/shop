@@ -21,8 +21,7 @@ func (d *DiscountUseCase) GetAllDiscounts(ctx context.Context, request *GetAllDi
 
 // GetDiscountById and return it
 func (d *DiscountUseCase) GetDiscountById(ctx context.Context, id int) (*DiscountCode, error) {
-	//TODO implement me
-	panic("implement me")
+	return d.sv.GetDiscountById(id)
 }
 
 // GetDiscountByCode and return it
