@@ -25,14 +25,32 @@ func TestDiscountService_GetAllDiscounts(t *testing.T) {
 
 	result, err := sv.GetAllDiscounts(0, testingObjCounts)
 	assert.Equal(t, len(result), testingObjCounts, "fetching discount codes failed. fetched items length with mocked items length are not equal")
-	assert.NoError(t, err, "Fetching all discounts from discount service failed")
+	assert.NoError(t, err, "Fetching discounts with id from discount service failed")
 
 	assertDiscountCodes(t, mockedDiscounts, result)
 }
 
 // TestDiscountService_GetDiscountByCode functionality
 func TestDiscountService_GetDiscountByCode(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "setting up database connection failed")
+	testingObjCounts := 1
 
+	sv := createDiscountService(db)
+
+	mockedDiscounts := mockAndInsertDiscountCodes(db, testingObjCounts)
+	defer destructDiscountCodes(db, mockedDiscounts)
+	assert.Equal(t, len(mockedDiscounts), testingObjCounts, "Initializing discount codes mocked objects failed !Required amounts and created amounts are not equal")
+
+	wrongCode := "wrongDiscountCode"
+	_, err = sv.GetDiscountByCode(wrongCode)
+	assert.Error(t, err, "Expected error on fetching discount with wrong code")
+	assert.ErrorIs(t, err, DiscountNotFound, "Expected error on fetching discount with wrong code")
+
+	result, err := sv.GetDiscountByCode(mockedDiscounts[0].Code)
+	assert.NoError(t, err, "Fetching discounts with code from discount service failed")
+
+	assertDiscountCodes(t, mockedDiscounts, []DiscountCode{*result})
 }
 
 // TestDiscountService_GetDiscountByCode functionality
