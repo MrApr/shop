@@ -24,6 +24,9 @@ func (p *PostTypeService) GetAllPostTypes() ([]PostType, error) {
 
 // PostTypeExists or not based on given it
 func (p *PostTypeService) PostTypeExists(id int) error {
-	//TODO implement me
-	panic("implement me")
+	exists := p.repo.PostTypeExists(id)
+	if !exists {
+		return PostTypeDoesntExists
+	}
+	return nil
 }

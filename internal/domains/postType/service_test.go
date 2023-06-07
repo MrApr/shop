@@ -3,6 +3,7 @@ package postType
 import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+	"math/rand"
 	"testing"
 )
 
@@ -30,7 +31,22 @@ func TestPostTypeService_GetAllPostTypes(t *testing.T) {
 
 // TestPostTypeService_PostTypeExists functionality
 func TestPostTypeService_PostTypeExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	sv := createPostTypeService(conn)
+	testingObjsCount := 1
+
+	mockedPostTypes := mockAndInsertPostTypes(conn, testingObjsCount)
+	assert.Equal(t, len(mockedPostTypes), testingObjsCount, "Mocked objects are not enough as expected")
+
+	err = sv.PostTypeExists(mockedPostTypes[0].Id)
+	assert.NoError(t, err, "Post type exists, expected no error but received one")
+
+	randWrongId := rand.Int()
+	err = sv.PostTypeExists(randWrongId)
+	assert.Error(t, err, "Post type with given id doesnt exist, expected error but received none")
+	assert.ErrorIs(t, err, PostTypeDoesntExists, "Post type with given id doesnt exist, expected PostTypeDoesntExists error but received none")
 }
 
 // createPostTypeService and return it
