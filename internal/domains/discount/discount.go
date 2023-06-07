@@ -22,3 +22,5 @@ type DiscountUseCaseInterface interface {
 	GetDiscountById(ctx context.Context, id int) (*DiscountCode, error)
 	GetDiscountByCode(ctx context.Context, code string) (*DiscountCode, error)
 }
+
+//Todo Should get fetched only by authorized users ( Middleware limitation )
