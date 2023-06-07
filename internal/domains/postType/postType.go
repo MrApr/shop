@@ -11,7 +11,7 @@ type PostTypeRepositoryInterface interface {
 // PostTypeServiceInterface defines set of methods for every type who is going to be and used as Service for post type
 type PostTypeServiceInterface interface {
 	GetAllPostTypes() ([]PostType, error)
-	PostTypeExists(id int) bool
+	PostTypeExists(id int) error
 }
 
 // PostTypeUseCaseInterface defines set of methods for every type who is going to be and used as Use Case for post type
