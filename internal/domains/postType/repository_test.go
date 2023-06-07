@@ -28,7 +28,21 @@ func TestPostTypeRepository_GetAllPostTypes(t *testing.T) {
 
 // TestPostTypeRepository_PostTypeExists functionality
 func TestPostTypeRepository_PostTypeExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up temporary database connection failed")
 
+	repo := createPostTypeRepository(conn)
+	testingObjsCount := 1
+
+	mockedPostTypes := mockAndInsertPostTypes(conn, testingObjsCount)
+	assert.Equal(t, len(mockedPostTypes), testingObjsCount, "Mocked objects are not enough as expected")
+
+	exists := repo.PostTypeExists(mockedPostTypes[0].Id)
+	assert.True(t, exists, "Existence method of repository is not correct, expected true")
+
+	randWrongId := rand.Int()
+	exists = repo.PostTypeExists(randWrongId)
+	assert.False(t, exists, "Existence method of repository is not correct, expected False")
 }
 
 // setupDbConnection and run migration

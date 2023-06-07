@@ -1,6 +1,9 @@
 package postType
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"gorm.io/gorm"
+)
 
 // PostTypeRepository plays role post type's repository and implements PostTypeRepositoryInterface
 type PostTypeRepository struct {
@@ -23,6 +26,9 @@ func (p *PostTypeRepository) GetAllPostTypes() []PostType {
 
 // PostTypeExists checks whether post types exist or not
 func (p *PostTypeRepository) PostTypeExists(id int) bool {
-	//TODO implement me
-	panic("implement me")
+	postType := new(PostType)
+
+	result := p.db.Where("id = ?", id).First(postType)
+
+	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
