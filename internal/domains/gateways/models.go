@@ -21,3 +21,9 @@ type GateWay struct {
 	UpdateAt      *time.Time   `json:"update_at"`
 	DeletedAt     *time.Time   `json:"deleted_at"`
 }
+
+// GetAllGatewaysRequest represents request structure for fetching all gateways from system
+type GetAllGatewaysRequest struct {
+	TypeId      int   `json:"type_id" validate:"required,min=1"`
+	OnlyActives *bool `json:"only_actives,omitempty" validate:"omitempty,boolean"`
+}

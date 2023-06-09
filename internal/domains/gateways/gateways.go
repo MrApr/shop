@@ -19,15 +19,15 @@ type GatewayTypesUseCaseInterface interface {
 
 // GatewayRepositoryInterface defines set of abstract methods for every type who wants to play role as gateway repository
 type GatewayRepositoryInterface interface {
-	GetAllGateways(onlyActives bool) []GateWay
+	GetAllGateways(typeId int, onlyActives bool) []GateWay
 }
 
 // GatewayServiceInterface defines set of abstract methods for every type who wants to play role as gateway service
 type GatewayServiceInterface interface {
-	GetAllGateways() ([]GateWay, error)
+	GetAllGateways(typeId int, onlyActives bool) ([]GateWay, error)
 }
 
 // GatewayUseCaseInterface defines set of abstract methods for every type who wants to play role as gateway service
 type GatewayUseCaseInterface interface {
-	GetAllGateways(ctx context.Context) ([]GateWay, error)
+	GetAllGateways(ctx context.Context, request *GetAllGatewaysRequest) ([]GateWay, error)
 }
