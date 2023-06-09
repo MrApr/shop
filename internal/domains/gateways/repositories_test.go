@@ -31,9 +31,36 @@ func TestGatewayTypesRepository_GetAllTypes(t *testing.T) {
 	assertGatewayTypes(t, mockedTypes, result)
 }
 
+// TestGatewayRepository_GetAllGateways functionality
+func TestGatewayRepository_GetAllGateways(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	repo := createGatewayRepo(db)
+	testingObjCount := 2
+
+	mockedTypes := mockAndInsertGatewayTypes(db, 1, false)
+	defer destructMockedTypes(db, mockedTypes)
+
+	mockedGateways := mockAndInsertGateways(db, testingObjCount, mockedTypes[0].Id, false)
+	defer destructMockedGateways(db, mockedGateways)
+	assert.Equal(t, len(mockedGateways), testingObjCount, "Mocked objects length is not as equal as required and expected")
+
+	result := repo.GetAllGateways(mockedTypes[0].Id, true)
+	assert.Equal(t, len(result), 0, "expected no result because requested for only active gateways")
+
+	result = repo.GetAllGateways(mockedTypes[0].Id, false)
+	assertGateways(t, mockedGateways, result)
+}
+
 // createGatewayTypeRepo and return it
 func createGatewayTypeRepo(db *gorm.DB) GatewayTypesRepositoryInterface {
 	return NewGatewayTypeRepo(db)
+}
+
+// createGatewayRepo and return it
+func createGatewayRepo(db *gorm.DB) GatewayRepositoryInterface {
+	return NewGatewayRepository(db)
 }
 
 // setupDbConnection and run migration
@@ -71,13 +98,51 @@ func mockGatewayType(status bool) *GatewayType {
 	}
 }
 
+// mockAndInsertGateways into database for testing
+func mockAndInsertGateways(db *gorm.DB, count, typeId int, status bool) []GateWay {
+	gateways := make([]GateWay, 0, count)
+
+	for i := 0; i < count; i++ {
+		mockedGateway := mockGateway(typeId, status)
+		result := db.Create(mockedGateway)
+		if result.Error != nil {
+			continue
+		}
+
+		gateways = append(gateways, *mockedGateway)
+	}
+
+	return gateways
+}
+
+// mockGateway and return it
+func mockGateway(typeId int, status bool) *GateWay {
+	return &GateWay{
+		Name:          "Test gateway",
+		GatewayTypeId: typeId,
+		Token:         "Test token for gateways",
+		Status:        status,
+	}
+}
+
 // assertGatewayTypes and check whether they are equal or not
 func assertGatewayTypes(t *testing.T, mockedTypes, fetchedTypes []GatewayType) {
 	for index := range mockedTypes {
 		assert.Equal(t, mockedTypes[index].Id, fetchedTypes[index].Id, "mocked types and fetched types are not equal")
 		assert.Equal(t, mockedTypes[index].Title, fetchedTypes[index].Title, "mocked types and fetched types are not equal")
 		assert.Equal(t, mockedTypes[index].Status, fetchedTypes[index].Status, "mocked types and fetched types are not equal")
-		assert.True(t, fetchedTypes[index].Status, "Only active types should get received")
+		assert.True(t, fetchedTypes[index].Status, "Only active types should got received")
+	}
+}
+
+// assertGateways and check whether they are equal or not
+func assertGateways(t *testing.T, mockedGateways, fetchedGateways []GateWay) {
+	for index := range mockedGateways {
+		assert.Equal(t, mockedGateways[index].Id, fetchedGateways[index].Id, "mocked and fetched gateways are not equal")
+		assert.Equal(t, mockedGateways[index].Name, fetchedGateways[index].Name, "mocked and fetched gateways are not equal")
+		assert.Equal(t, mockedGateways[index].Token, fetchedGateways[index].Token, "mocked and fetched gateways are not equal")
+		assert.Equal(t, mockedGateways[index].GatewayTypeId, fetchedGateways[index].GatewayTypeId, "mocked and fetched gateways are not equal")
+		assert.Equal(t, mockedGateways[index].Status, fetchedGateways[index].Status, "mocked and fetched gateways are not equal")
 	}
 }
 
@@ -85,5 +150,12 @@ func assertGatewayTypes(t *testing.T, mockedTypes, fetchedTypes []GatewayType) {
 func destructMockedTypes(db *gorm.DB, gatewayTypes []GatewayType) {
 	for _, gatewayType := range gatewayTypes {
 		db.Unscoped().Delete(gatewayType)
+	}
+}
+
+// destructMockedGateways which are created during testing
+func destructMockedGateways(db *gorm.DB, gateways []GateWay) {
+	for _, gateway := range gateways {
+		db.Unscoped().Delete(gateway)
 	}
 }

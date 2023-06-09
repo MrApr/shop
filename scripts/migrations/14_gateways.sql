@@ -1,6 +1,7 @@
 CREATE TABLE `gateways`
 (
     `id`              INTEGER UNSIGNED AUTO_INCREMENT NOT NULL,
+    `name`            VARCHAR(255)                    NOT NULL,
     `gateway_type_id` INTEGER UNSIGNED                NOT NULL,
     `token`           VARCHAR(255)                    NOT NULL,
     `status`          BOOL      DEFAULT FALSE,
