@@ -11,4 +11,4 @@ CREATE TABLE `gateways`
     FOREIGN KEY (`gateway_type_id`) REFERENCES `gateway_types` (`id`)
 );
 
-CREATE INDEX gateways_status_index ON `gateways` (`id`);
+CREATE INDEX gateways_status_index ON `gateways` (`status`);
