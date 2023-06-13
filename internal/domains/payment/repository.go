@@ -53,6 +53,14 @@ func (p *PaymentRepository) UpdatePaymentRef(payment *Payment, refNum string) (*
 
 // UpdatePaymentTraceStatus for returned and fetched Trace Number
 func (p *PaymentRepository) UpdatePaymentTraceStatus(payment *Payment, traceNum, status string) (*Payment, error) {
-	//TODO implement me
-	panic("implement me")
+	if status != "" {
+		payment.Status = status
+	}
+
+	if traceNum != "" {
+		payment.TraceNum = &traceNum
+	}
+
+	result := p.db.Save(payment)
+	return payment, result.Error
 }
