@@ -2,6 +2,13 @@ package payment
 
 import "gorm.io/gorm"
 
+// Define payment status types
+const (
+	PaymentDefaultStatus string = "pending"
+	PaymentSuccessStatus string = "success"
+	PaymentFailureStatus string = "failed"
+)
+
 // PaymentRepository is the type which implements PaymentRepoContract
 type PaymentRepository struct {
 	db *gorm.DB
@@ -22,8 +29,13 @@ func (p *PaymentRepository) GetPayment(id int) (*Payment, error) {
 
 // GetUserLastPayment and return it
 func (p *PaymentRepository) GetUserLastPayment(userId int, pendPayment bool) (*Payment, error) {
-	//TODO implement me
-	panic("implement me")
+	var payment Payment
+	db := p.db.Where("user_id = ?", userId).Order("created_at DESC")
+	if pendPayment {
+		db = p.db.Where("status = ?", PaymentDefaultStatus)
+	}
+	result := db.First(&payment)
+	return &payment, result.Error
 }
 
 // CreatePayment in order to store it in db

@@ -1,17 +1,12 @@
 package payment
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"math/rand"
 	"testing"
-)
-
-const (
-	PaymentDefaultStatus string = "pending"
-	PaymentSuccessStatus string = "success"
-	PaymentFailureStatus string = "failed"
 )
 
 // TestPaymentRepository_GetPayment functionality
@@ -44,7 +39,7 @@ func TestPaymentRepository_GetUserLastPayment(t *testing.T) {
 
 	result, err := repo.GetUserLastPayment(payments[2].UserId, true)
 	assert.NoError(t, err, "Fetching single payment by id failed")
-	assert.Equal(t, result.Status, false, "Fetch user last created payment failed")
+	assert.Equal(t, result.Status, PaymentDefaultStatus, "Fetch user last created payment failed")
 
 	result, err = repo.GetUserLastPayment(payments[2].UserId, false)
 	assert.NoError(t, err, "Fetching single payment by id failed")
@@ -129,8 +124,8 @@ func mockAndInsertData(db *gorm.DB, count int, withSuccessStatTest bool) []Payme
 
 // mockPaymentInfo and return it for testing purpose
 func mockPaymentInfo() *Payment {
-	refNumber := "bbbbb"
-	tractNumber := "aaaaa"
+	refNumber := fmt.Sprintf("%s%d", "bbbbb", rand.Int())
+	tractNumber := fmt.Sprintf("%s%d", "aaaaa", rand.Int())
 	return &Payment{
 		UserId:     rand.Int(),
 		BasketId:   rand.Int(),
