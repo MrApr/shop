@@ -85,7 +85,7 @@ func runMigrationCmd(db *gorm.DB, file os.DirEntry) error {
 // getMigrationDir gets and returns sql migrations directories
 func getMigrationDir() string {
 	if os.Getenv(migrationDirEnvKey) != "" {
-		migrationsDir = os.Getenv(migrationsDir)
+		migrationsDir = os.Getenv(migrationDirEnvKey)
 	}
 
 	if migrationsDir == "" {
