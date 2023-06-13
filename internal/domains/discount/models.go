@@ -9,9 +9,9 @@ type DiscountCode struct {
 	Code            string     `json:"code" gorm:"uniqueIndex"`
 	DiscountPercent int        `json:"discount_percent"`
 	Status          bool       `json:"status"`
-	CreatedAt       *time.Time `json:"created_at"`
-	UpdateAt        *time.Time `json:"update_at"`
-	DeletedAt       *time.Time `json:"deleted_at"`
+	CreatedAt       *time.Time `json:"created_at,omitempty"`
+	UpdatedAt       *time.Time `json:"updated_at,omitempty"`
+	DeletedAt       *time.Time `json:"deleted_at,omitempty"`
 }
 
 // GetAllDiscountCodesRequest for incoming http requests that want to fetch all discount codes
