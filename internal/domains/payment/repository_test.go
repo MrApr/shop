@@ -63,30 +63,8 @@ func TestPaymentRepository_CreatePayment(t *testing.T) {
 	assert.NotZero(t, mockedPayment.UpdatedAt, "Payment creation failed")
 }
 
-// TestPaymentRepository_UpdatePayment functionality
-func TestPaymentRepository_UpdatePaymentRef(t *testing.T) {
-	conn, err := setupDbConnection()
-	assert.NoError(t, err, "Cannot make connection to database")
-
-	repo := createRepository(conn)
-	payments := mockAndInsertData(conn, 1, false)
-	defer destructPayments(conn, payments)
-	assert.Equal(t, 1, len(payments), "Mocking payments failed")
-
-	newRefNum := "akdkdakdaskdsa"
-
-	newPayment, err := repo.UpdatePaymentRef(&payments[0], newRefNum)
-	assert.NoError(t, err, "Payment Update ref-num operation failed")
-	assert.Equal(t, newPayment.RefNum, payments[0].RefNum, "Payment Update ref-num operation failed")
-
-	tmpPayment := new(Payment)
-	conn.Where("id = ?", payments[0].Id).First(tmpPayment)
-
-	assert.Equal(t, *tmpPayment.RefNum, newRefNum, "Payment Update ref-num operation failed")
-}
-
-// TestPaymentRepository_UpdatePayment functionality
-func TestPaymentRepository_UpdatePaymentTraceStatus(t *testing.T) {
+// TestPaymentRepository_UpdatePaymentTrace functionality
+func TestPaymentRepository_UpdatePaymentTrace(t *testing.T) {
 	conn, err := setupDbConnection()
 	assert.NoError(t, err, "Cannot make connection to database")
 
@@ -97,15 +75,37 @@ func TestPaymentRepository_UpdatePaymentTraceStatus(t *testing.T) {
 
 	newTraceNum := "akdkdakdaskdsa"
 
-	newPayment, err := repo.UpdatePaymentTraceStatus(&payments[0], newTraceNum, PaymentSuccessStatus)
+	newPayment, err := repo.UpdatePaymentTrace(&payments[0], newTraceNum)
+	assert.NoError(t, err, "Payment Update ref-num operation failed")
+	assert.Equal(t, newPayment.TraceNum, payments[0].TraceNum, "Payment Update ref-num operation failed")
+
+	tmpPayment := new(Payment)
+	conn.Where("id = ?", payments[0].Id).First(tmpPayment)
+
+	assert.Equal(t, *tmpPayment.TraceNum, newTraceNum, "Payment Update ref-num operation failed")
+}
+
+// TestPaymentRepository_UpdatePaymentRefStatus functionality
+func TestPaymentRepository_UpdatePaymentRefStatus(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Cannot make connection to database")
+
+	repo := createRepository(conn)
+	payments := mockAndInsertData(conn, 1, false)
+	defer destructPayments(conn, payments)
+	assert.Equal(t, 1, len(payments), "Mocking payments failed")
+
+	newRefNum := "akdkdakdaskdsa"
+
+	newPayment, err := repo.UpdatePaymentRefStatus(&payments[0], newRefNum, PaymentSuccessStatus)
 	assert.NoError(t, err, "Payment Update trace-num operation failed")
-	assert.Equal(t, newPayment.TraceNum, payments[0].TraceNum, "Payment Update trace-num operation failed")
+	assert.Equal(t, newPayment.RefNum, payments[0].RefNum, "Payment Update trace-num operation failed")
 	assert.Equal(t, newPayment.Status, PaymentSuccessStatus, "Payment Update trace-num operation failed")
 
 	tmpPayment := new(Payment)
 	conn.Where("id = ?", payments[0].Id).First(tmpPayment)
 
-	assert.Equal(t, *tmpPayment.TraceNum, newTraceNum, "Payment Update trace-num operation failed")
+	assert.Equal(t, *tmpPayment.RefNum, newRefNum, "Payment Update trace-num operation failed")
 	assert.Equal(t, tmpPayment.Status, PaymentSuccessStatus, "Payment Update trace-num operation failed")
 }
 

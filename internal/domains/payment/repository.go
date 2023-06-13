@@ -44,21 +44,21 @@ func (p *PaymentRepository) CreatePayment(payment *Payment) error {
 	return result.Error
 }
 
-// UpdatePaymentRef for fetched ref number
-func (p *PaymentRepository) UpdatePaymentRef(payment *Payment, refNum string) (*Payment, error) {
-	payment.RefNum = &refNum
+// UpdatePaymentTrace for fetched ref number
+func (p *PaymentRepository) UpdatePaymentTrace(payment *Payment, traceNum string) (*Payment, error) {
+	payment.TraceNum = &traceNum
 	result := p.db.Save(payment)
 	return payment, result.Error
 }
 
-// UpdatePaymentTraceStatus for returned and fetched Trace Number
-func (p *PaymentRepository) UpdatePaymentTraceStatus(payment *Payment, traceNum, status string) (*Payment, error) {
+// UpdatePaymentRefStatus for returned and fetched Trace Number
+func (p *PaymentRepository) UpdatePaymentRefStatus(payment *Payment, refNum, status string) (*Payment, error) {
 	if status != "" {
 		payment.Status = status
 	}
 
-	if traceNum != "" {
-		payment.TraceNum = &traceNum
+	if refNum != "" {
+		payment.RefNum = &refNum
 	}
 
 	result := p.db.Save(payment)
