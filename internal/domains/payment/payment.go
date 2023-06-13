@@ -7,8 +7,8 @@ type PaymentRepoContract interface {
 	GetPayment(id int) (*Payment, error)
 	GetUserLastPayment(userId int, pendPayment bool) (*Payment, error)
 	CreatePayment(payment *Payment) error
-	UpdatePaymentRef(payment *Payment, refNum string) (*Payment, error)
-	UpdatePaymentTraceStatus(payment *Payment, traceNum, status string) (*Payment, error)
+	UpdatePaymentTrace(payment *Payment, traceNum string) (*Payment, error)
+	UpdatePaymentRefStatus(payment *Payment, refNum, status string) (*Payment, error)
 }
 
 // PaymentStorageServiceContract defines set of methods that every type, which wants to play payment service role, should obey

@@ -6,8 +6,10 @@ import (
 	"shop/internal/domains/address"
 	"shop/internal/domains/basket"
 	"shop/internal/domains/discount"
+	"shop/internal/domains/gateways"
 	"shop/internal/domains/postType"
 	"shop/pkg/database"
+	"strings"
 	"sync"
 )
 
@@ -22,6 +24,7 @@ var basketRepo basket.BasketRepositoryInterface
 var addressRepo address.AddressRepositoryInterface
 var discountRepo discount.DiscountRepositoryInterface
 var postTypeRepo postType.PostTypeRepositoryInterface
+var gatewayRepo gateways.GatewayRepositoryInterface
 var once sync.Once
 
 // init initializes user handler
@@ -31,6 +34,7 @@ func initFunc() {
 	addressRepo = address.NewAddressRepository(db)
 	discountRepo = discount.NewRepository(db)
 	postTypeRepo = postType.NewRepository(db)
+	gatewayRepo = gateways.NewGatewayRepository(db)
 }
 
 // connectToDb makes database connection
@@ -79,4 +83,15 @@ func IsPostTypeValid(id int) error {
 		return PostTypeIsInvalid
 	}
 	return nil
+}
+
+// GetGatewayToken and return it
+func GetGatewayToken(requestedGwTitle string) string {
+	gateways := gatewayRepo.GetAllGateways(1, true)
+	for _, gateway := range gateways {
+		if strings.ToLower(gateway.Name) == strings.ToLower(requestedGwTitle) {
+			return gateway.Token
+		}
+	}
+	return ""
 }
