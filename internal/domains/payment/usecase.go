@@ -3,21 +3,20 @@ package payment
 import (
 	"context"
 	"gorm.io/gorm"
+	"shop/internal/domains/payment/internal"
 	"shop/pkg/advancedError"
 )
 
 // PaymentUseCase is the usecase which implements payment use case contract and satisfies all of it's methods
 type PaymentUseCase struct {
-	paymentSvPGW     PaymentPGWServiceContract
 	paymentSvStorage PaymentStorageServiceContract
 	tokenDecoder     func(ctx context.Context, token string) (int, error)
 	db               *gorm.DB
 }
 
 // NewPaymentUseCase creates and returns payment usecase
-func NewPaymentUseCase(svPgw PaymentPGWServiceContract, svStorage PaymentStorageServiceContract, db *gorm.DB, decoder func(ctx context.Context, token string) (int, error)) PaymentUseCaseContract {
+func NewPaymentUseCase(svStorage PaymentStorageServiceContract, db *gorm.DB, decoder func(ctx context.Context, token string) (int, error)) PaymentUseCaseContract {
 	return &PaymentUseCase{
-		paymentSvPGW:     svPgw,
 		paymentSvStorage: svStorage,
 		db:               db,
 		tokenDecoder:     decoder,
@@ -41,7 +40,11 @@ func (p *PaymentUseCase) Pay(ctx context.Context, token string, paymentId int) (
 		return nil, doesntHavePermission
 	}
 
-	return p.paymentSvPGW.Pay(paymentId)
+	paymentSvPGW, err := p.getPaymentSvPGWForUser(paymentId)
+	if err != nil {
+		return nil, err
+	}
+	return paymentSvPGW.Pay(paymentId)
 }
 
 // Verify done payment by user
@@ -58,7 +61,12 @@ func (p *PaymentUseCase) Verify(ctx context.Context, token string, request *Paym
 		}
 	}()
 
-	result, err := p.paymentSvPGW.Verify(request.PaymentId, request.Authority)
+	paymentSvPGW, err := p.getPaymentSvPGWForUser(request.PaymentId)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := paymentSvPGW.Verify(request.PaymentId, request.Authority)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -89,4 +97,13 @@ func (p *PaymentUseCase) userCanPay(ctx context.Context, paymentId int, token st
 	}
 
 	return nil
+}
+
+// getPaymentSvPGWForUser for and return it to do payment operation
+func (p *PaymentUseCase) getPaymentSvPGWForUser(paymentId int) (PaymentPGWServiceContract, error) {
+	payment, err := p.paymentSvStorage.GetPayment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+	return internal.CreatePaymentGateway(payment.GatewayId, NewPaymentRepo(p.db)), nil
 }

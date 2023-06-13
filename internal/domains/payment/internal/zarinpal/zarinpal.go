@@ -1,4 +1,4 @@
-package payment
+package zarinpal
 
 import (
 	"errors"
@@ -29,7 +29,7 @@ type ZarinpalPGW struct {
 }
 
 // NewZarinpal creates and returns zarinpal implementation
-func NewZarinpal(repo payment.PaymentRepoContract, key string, isSandBox bool) payment.PaymentPGWServiceContract {
+func NewZarinpal(repo payment.PaymentRepoContract, isSandBox bool) payment.PaymentPGWServiceContract {
 	merchantId := paymentHandler.GetGatewayToken(gatewayName)
 	if merchantId == "" {
 		log.Fatalf("%s", "Required enviroment variable for zarinpal is not set properly")
