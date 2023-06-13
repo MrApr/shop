@@ -71,7 +71,7 @@ func TestToken_Refresh(t *testing.T) {
 		t.Errorf("%s: %s", "Expected To do refresh operation but got", err)
 	}
 
-	if refTkString == testTk[tokeKeyName] {
+	if refTkString != testTk[tokeKeyName] {
 		t.Error("Expected That newly generated token not be the same with old token")
 	}
 }

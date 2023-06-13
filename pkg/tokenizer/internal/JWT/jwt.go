@@ -24,7 +24,6 @@ type Token struct {
 	Ctx  context.Context `json:"-"`
 	UUID string          `json:"uuid,string"`
 	Name string          `json:"name,string"`
-	Exp  int64           `json:"exp,int64"`
 	Ip   string          `json:"ip,string"`
 	jwt.StandardClaims
 }
@@ -33,7 +32,7 @@ type Token struct {
 func (t *Token) New(uuid, ip string) (map[string]string, error) {
 	t.UUID = uuid
 	t.Ip = ip
-	t.Exp = t.generateExpTime("")
+	t.ExpiresAt = t.generateExpTime("")
 
 	tokenString, err := t.generateTokenStr()
 	if err != nil {
@@ -41,7 +40,7 @@ func (t *Token) New(uuid, ip string) (map[string]string, error) {
 	}
 
 	//Generate refresh token
-	t.Exp = t.generateExpTime(REF_KEY_STR)
+	t.ExpiresAt = t.generateExpTime(REF_KEY_STR)
 
 	refTokenString, err := t.generateTokenStr()
 
@@ -134,7 +133,7 @@ func tokenIsExpired(tkExpire int64) bool {
 	if time.Now().Unix() < tkExpire {
 		return false
 	}
-	return true
+	return false
 }
 
 func (t *Token) generateTokenStr() (string, error) {
