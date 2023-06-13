@@ -131,7 +131,7 @@ func (t *Token) generateExpTime(tkType string) int64 {
 
 // tokenIsExpired for checking if token is expired or not
 func tokenIsExpired(tkExpire int64) bool {
-	if time.Now().Unix() > tkExpire {
+	if time.Now().Unix() < tkExpire {
 		return false
 	}
 	return true
