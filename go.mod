@@ -16,6 +16,7 @@ require (
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/sinabakh/go-zarinpal-checkout v0.0.0-20171230121056-f6518b3fddc3 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
