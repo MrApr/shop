@@ -40,8 +40,8 @@ func (p *PaymentRepository) GetUserLastPayment(userId int, pendPayment bool) (*P
 
 // CreatePayment in order to store it in db
 func (p *PaymentRepository) CreatePayment(payment *Payment) error {
-	//TODO implement me
-	panic("implement me")
+	result := p.db.Create(payment)
+	return result.Error
 }
 
 // UpdatePaymentRef for fetched ref number
