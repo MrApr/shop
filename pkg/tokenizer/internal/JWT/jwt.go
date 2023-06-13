@@ -133,7 +133,7 @@ func tokenIsExpired(tkExpire int64) bool {
 	if time.Now().Unix() < tkExpire {
 		return false
 	}
-	return false
+	return true
 }
 
 func (t *Token) generateTokenStr() (string, error) {
