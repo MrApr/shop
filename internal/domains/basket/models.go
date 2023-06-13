@@ -11,9 +11,9 @@ type Basket struct {
 	UserId    int                `json:"-"`
 	Status    bool               `json:"status" gorm:"index"`
 	Products  []products.Product `json:"products" gorm:"many2many:basket_products;foreignKey:Id;joinForeignKey:BasketId;References:Id;joinReferences:ProductId"`
-	CreatedAt *time.Time         `json:"created_at"`
-	UpdateAt  *time.Time         `json:"update_at"`
-	DeletedAt *time.Time         `json:"deleted_at"`
+	CreatedAt *time.Time         `json:"created_at,omitempty"`
+	UpdatedAt *time.Time         `json:"updated_at,omitempty"`
+	DeletedAt *time.Time         `json:"deleted_at,omitempty"`
 }
 
 // BasketProduct is the struct which represents basket_products table

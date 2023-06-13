@@ -7,8 +7,8 @@ type GatewayType struct {
 	Id        int        `json:"id" gorm:"primaryKey"`
 	Title     string     `json:"title"`
 	Status    bool       `json:"status" gorm:"index"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 // GateWay represents Gateway entity which handles payments in system
@@ -19,9 +19,9 @@ type GateWay struct {
 	Type          *GatewayType `json:"GatewayType" gorm:"foreignKey:GatewayTypeId;references:Id"`
 	Token         string       `json:"token" gorm:"index"`
 	Status        bool         `json:"status"  gorm:"index"`
-	CreatedAt     *time.Time   `json:"created_at"`
-	UpdateAt      *time.Time   `json:"update_at"`
-	DeletedAt     *time.Time   `json:"deleted_at"`
+	CreatedAt     *time.Time   `json:"created_at,omitempty"`
+	UpdatedAt     *time.Time   `json:"updated_at,omitempty"`
+	DeletedAt     *time.Time   `json:"deleted_at,omitempty"`
 }
 
 // TableName overrides table name in gorm db

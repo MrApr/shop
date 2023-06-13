@@ -9,9 +9,9 @@ type Address struct {
 	CityId    int        `json:"city_id"`
 	City      *City      `json:"city,omitempty" gorm:"foreignKey:CityId;references:Id"`
 	Address   string     `json:"address"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdateAt  *time.Time `json:"update_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
 // TableName overrides table name for gorm model

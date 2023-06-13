@@ -12,12 +12,12 @@ type Payment struct {
 	GatewayId  int        `json:"gateway_id"`
 	PostTypeId int        `json:"post_type_id"`
 	TotalPrice float64    `json:"total_price"`
-	RefNum     string     `json:"ref_num" gorm:"uniqueIndex"`
-	TraceNum   string     `json:"trace_num" gorm:"uniqueIndex"`
+	RefNum     *string    `json:"ref_num,omitempty" gorm:"uniqueIndex"`
+	TraceNum   *string    `json:"trace_num,omitempty" gorm:"uniqueIndex"`
 	Status     string     `json:"status"`
-	CreatedAt  *time.Time `json:"created_at"`
-	UpdateAt   *time.Time `json:"update_at"`
-	DeletedAt  *time.Time `json:"deleted_at"`
+	CreatedAt  *time.Time `json:"created_at,omitempty"`
+	UpdatedAt  *time.Time `json:"updated_at,omitempty"`
+	DeletedAt  *time.Time `json:"deleted_at,omitempty"`
 }
 
 // CreatePaymentRequest defines set of methods for payment creation
