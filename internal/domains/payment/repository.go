@@ -46,8 +46,9 @@ func (p *PaymentRepository) CreatePayment(payment *Payment) error {
 
 // UpdatePaymentRef for fetched ref number
 func (p *PaymentRepository) UpdatePaymentRef(payment *Payment, refNum string) (*Payment, error) {
-	//TODO implement me
-	panic("implement me")
+	payment.RefNum = &refNum
+	result := p.db.Save(payment)
+	return payment, result.Error
 }
 
 // UpdatePaymentTraceStatus for returned and fetched Trace Number
