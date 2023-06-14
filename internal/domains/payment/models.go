@@ -5,7 +5,7 @@ import "time"
 // Payment defines set of fields for payment entity in system
 type Payment struct {
 	Id         int        `json:"id" gorm:"primaryKey"`
-	UserId     int        `json:"user_id"`
+	UserId     int        `json:"-"`
 	BasketId   int        `json:"basket_id"`
 	AddressId  int        `json:"address_id"`
 	DiscountId int        `json:"discount_id"`
