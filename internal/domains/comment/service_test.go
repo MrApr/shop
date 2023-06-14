@@ -33,7 +33,20 @@ func TestCommentService_GetAllActiveComments(t *testing.T) {
 
 // TestCommentService_CreateComment functionality
 func TestCommentService_CreateComment(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	sv := createService(db)
+	pId := rand.Int()
+
+	mockedCm := mockComment(true, pId)
+
+	createdComment, err := sv.CreateComment(mockedCm.UserId, mockedCm.ProductId, mockedCm.Description)
+	assert.NoError(t, err, "Expected no error comment creation")
+	assert.Equal(t, mockedCm.UserId, createdComment.UserId, "comment creation failed")
+	assert.Equal(t, mockedCm.ProductId, createdComment.ProductId, "comment creation failed")
+	assert.Equal(t, mockedCm.Description, createdComment.Description, "comment creation failed")
+	assert.True(t, createdComment.Status, "Comment creation default status is wrong")
 }
 
 // TestCommentService_DeleteComment functionality

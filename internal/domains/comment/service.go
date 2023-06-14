@@ -1,5 +1,8 @@
 package comment
 
+// CommentDefaultStatus defines default status for comment
+const CommentDefaultStatus bool = true
+
 // CommentService implements CommentServiceInterface
 type CommentService struct {
 	repo CommentRepositoryInterface
@@ -25,8 +28,15 @@ func (c *CommentService) GetAllActiveComments(productId int) ([]Comment, error) 
 
 // CreateComment and return it
 func (c *CommentService) CreateComment(userId, productId int, description string) (*Comment, error) {
-	//TODO implement me
-	panic("implement me")
+	cm := &Comment{
+		ProductId:   productId,
+		UserId:      userId,
+		Description: description,
+		Status:      CommentDefaultStatus,
+	}
+
+	err := c.repo.CreateComment(cm)
+	return cm, err
 }
 
 // DeleteComment and which exists in db
