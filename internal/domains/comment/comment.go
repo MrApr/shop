@@ -12,7 +12,6 @@ type CommentRepositoryInterface interface {
 
 // CommentServiceInterface defines set of methods which every type who wants to play role as comment service should obey
 type CommentServiceInterface interface {
-	GetComment(cmId int) (*Comment, error)
 	GetAllActiveComments(productId int) ([]Comment, error)
 	CreateComment(userId, productId int, description string) (*Comment, error)
 	DeleteComment(cmId int) error
