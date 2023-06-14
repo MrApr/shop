@@ -31,7 +31,21 @@ func TestCommentUseCase_GetAllActiveComments(t *testing.T) {
 
 // TestCommentUseCase_CreateComment functionality
 func TestCommentUseCase_CreateComment(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	uC := createUseCase(db)
+	ctx := context.Background()
+	pId := rand.Int()
+
+	mockedCreateRequest := mockCreateCommentRequest(pId)
+
+	createdComment, err := uC.CreateComment(ctx, "", mockedCreateRequest)
+	assert.NoError(t, err, "Expected no error comment creation")
+	assert.Equal(t, 1, createdComment.UserId, "comment creation failed")
+	assert.Equal(t, mockedCreateRequest.ProductId, createdComment.ProductId, "comment creation failed")
+	assert.Equal(t, mockedCreateRequest.Description, createdComment.Description, "comment creation failed")
+	assert.True(t, createdComment.Status, "Comment creation default status is wrong")
 }
 
 // TestCommentUseCase_DeleteComment functionality
@@ -41,5 +55,15 @@ func TestCommentUseCase_DeleteComment(t *testing.T) {
 
 // createUseCase and return it
 func createUseCase(db *gorm.DB) CommentUseCaseInterface {
-	return NewCommentUseCase(NewCommentService(NewCommentRepository(db)))
+	return NewCommentUseCase(NewCommentService(NewCommentRepository(db)), func(ctx context.Context, token string) (int, error) {
+		return 1, nil
+	})
+}
+
+// mockCreateCommentRequest and return it
+func mockCreateCommentRequest(pId int) *CreateCommentRequest {
+	return &CreateCommentRequest{
+		ProductId:   pId,
+		Description: "Test product",
+	}
 }

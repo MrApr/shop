@@ -20,6 +20,6 @@ type CommentServiceInterface interface {
 // CommentUseCaseInterface defines set of methods which every type who wants to play role as comment use-case should obey
 type CommentUseCaseInterface interface {
 	GetAllActiveComments(ctx context.Context, productId int) ([]Comment, error)
-	CreateComment(ctx context.Context, request *CreateCommentRequest) (*Comment, error)
+	CreateComment(ctx context.Context, token string, request *CreateCommentRequest) (*Comment, error)
 	DeleteComment(ctx context.Context, cmId int) error
 }
