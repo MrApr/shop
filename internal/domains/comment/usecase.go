@@ -40,6 +40,5 @@ func (c *CommentUseCase) CreateComment(ctx context.Context, token string, reques
 
 // DeleteComment which already exists in database
 func (c *CommentUseCase) DeleteComment(ctx context.Context, cmId int) error {
-	//TODO implement me
-	panic("implement me")
+	return c.sv.DeleteComment(cmId)
 }

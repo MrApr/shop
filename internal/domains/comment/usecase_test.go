@@ -50,7 +50,23 @@ func TestCommentUseCase_CreateComment(t *testing.T) {
 
 // TestCommentUseCase_DeleteComment functionality
 func TestCommentUseCase_DeleteComment(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	uC := createUseCase(db)
+	testingCount := 1
+	ctx := context.Background()
+
+	mockedCm := mockAndInsertComments(db, testingCount, 0, true)
+	defer destructComments(db, mockedCm)
+	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
+
+	err = uC.DeleteComment(ctx, mockedCm[0].Id)
+	assert.NoError(t, err, "deleting comment failed")
+
+	tmpCm := new(Comment)
+	db.Where("id = ?", mockedCm[0].Id).First(tmpCm)
+	assert.Zero(t, tmpCm.Id, "deleting comment failed")
 }
 
 // createUseCase and return it
