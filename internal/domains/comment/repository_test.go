@@ -52,7 +52,17 @@ func TestCommentRepository_GetAllActiveComments(t *testing.T) {
 
 // TestCommentRepository_CreateComment functionality
 func TestCommentRepository_CreateComment(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createRepository(db)
+	pId := rand.Int()
+
+	mockedCm := mockComment(true, pId)
+
+	err = repo.CreateComment(mockedCm)
+	assert.NotZero(t, mockedCm.Id, "comment creation failed")
+	assert.NoError(t, err, "comment creation failed")
 }
 
 // TestCommentRepository_DeleteComment functionality

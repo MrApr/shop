@@ -30,8 +30,7 @@ func (c *CommentRepository) GetAllActiveComments(productId int) []Comment {
 
 // CreateComment and return it
 func (c *CommentRepository) CreateComment(comment *Comment) error {
-	//TODO implement me
-	panic("implement me")
+	return c.db.Create(comment).Error
 }
 
 // DeleteComment and return it
