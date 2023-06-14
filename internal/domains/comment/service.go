@@ -41,6 +41,10 @@ func (c *CommentService) CreateComment(userId, productId int, description string
 
 // DeleteComment and which exists in db
 func (c *CommentService) DeleteComment(cmId int) error {
-	//TODO implement me
-	panic("implement me")
+	comment := c.repo.GetComment(cmId)
+	if comment.Id == 0 {
+		return CommentNotFound
+	}
+
+	return c.repo.DeleteComment(comment)
 }
