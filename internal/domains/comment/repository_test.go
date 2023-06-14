@@ -67,7 +67,22 @@ func TestCommentRepository_CreateComment(t *testing.T) {
 
 // TestCommentRepository_DeleteComment functionality
 func TestCommentRepository_DeleteComment(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createRepository(db)
+	testingCount := 1
+
+	mockedCm := mockAndInsertComments(db, testingCount, 0, true)
+	defer destructComments(db, mockedCm)
+	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
+
+	err = repo.DeleteComment(&mockedCm[0])
+	assert.NoError(t, err, "deleting comment failed")
+
+	tmpCm := new(Comment)
+	db.Where("id = ?", mockedCm[0].Id).First(tmpCm)
+	assert.Zero(t, tmpCm.Id, "deleting comment failed")
 }
 
 // createRepository and return it for testing purpose

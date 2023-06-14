@@ -35,6 +35,5 @@ func (c *CommentRepository) CreateComment(comment *Comment) error {
 
 // DeleteComment and return it
 func (c *CommentRepository) DeleteComment(comment *Comment) error {
-	//TODO implement me
-	panic("implement me")
+	return c.db.Delete(comment).Error
 }
