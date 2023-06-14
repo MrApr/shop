@@ -20,7 +20,7 @@ func (c *CommentService) GetAllActiveComments(productId int) ([]Comment, error) 
 	comments := c.repo.GetAllActiveComments(productId)
 
 	if len(comments) == 0 {
-		return nil, NoProductsFound
+		return nil, NoCommentsFound
 	}
 
 	return comments, nil

@@ -18,7 +18,7 @@ func TestCommentService_GetAllActiveComments(t *testing.T) {
 
 	_, err = sv.GetAllActiveComments(pId)
 	assert.Error(t, err, "Expected error on null comments")
-	assert.ErrorIs(t, err, NoProductsFound, "Expected error on null comments")
+	assert.ErrorIs(t, err, NoCommentsFound, "Expected error on null comments")
 
 	mockedCm := mockAndInsertComments(db, testingCount, pId, true)
 	defer destructComments(db, mockedCm)
