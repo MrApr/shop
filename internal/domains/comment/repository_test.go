@@ -14,9 +14,11 @@ func TestCommentRepository_GetComment(t *testing.T) {
 	assert.NoError(t, err, "Setting up database connection failed")
 
 	repo := createRepository(db)
+	testingCount := 1
 
-	mockedCm := mockAndInsertComments(db, 1, true)
-	assert.Equal(t, 1, len(mockedCm), "Mocked comments length is not equal as expected")
+	mockedCm := mockAndInsertComments(db, testingCount, 0, true)
+	defer destructComments(db, mockedCm)
+	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
 
 	fetchedCm := repo.GetComment(mockedCm[0].Id)
 	assertComments(t, []Comment{*fetchedCm}, mockedCm)
@@ -24,7 +26,28 @@ func TestCommentRepository_GetComment(t *testing.T) {
 
 // TestCommentRepository_GetAllActiveComments functionality
 func TestCommentRepository_GetAllActiveComments(t *testing.T) {
+	db, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createRepository(db)
+	testingCount := 2
+	pId := rand.Int()
+
+	mockedCm := mockAndInsertComments(db, testingCount, pId, false)
+	defer destructComments(db, mockedCm)
+	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
+
+	fetchedCms := repo.GetAllActiveComments(pId)
+	assert.Equal(t, len(fetchedCms), 0, "Expected no active comments for product but received some")
+
+	mockedCm = mockAndInsertComments(db, testingCount, pId, true)
+	defer destructComments(db, mockedCm)
+	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
+
+	fetchedCms = repo.GetAllActiveComments(pId)
+	assert.Equal(t, len(fetchedCms), testingCount, "Expected no active comments for product but received some")
+
+	assertComments(t, fetchedCms, mockedCm)
 }
 
 // TestCommentRepository_CreateComment functionality
@@ -53,10 +76,10 @@ func setupDbConnection() (*gorm.DB, error) {
 }
 
 // mockAndInsertComments into database
-func mockAndInsertComments(db *gorm.DB, count int, status bool) []Comment {
+func mockAndInsertComments(db *gorm.DB, count, pId int, status bool) []Comment {
 	comments := make([]Comment, 0, count)
 	for i := 0; i < count; i++ {
-		mockedCm := mockComment(status)
+		mockedCm := mockComment(status, pId)
 		result := db.Create(mockedCm)
 		if result.Error != nil {
 			continue
@@ -68,10 +91,13 @@ func mockAndInsertComments(db *gorm.DB, count int, status bool) []Comment {
 }
 
 // mockComment and return it for testing purpose
-func mockComment(status bool) *Comment {
+func mockComment(status bool, pId int) *Comment {
+	if pId == 0 {
+		pId = rand.Int()
+	}
 	return &Comment{
 		Id:          0,
-		ProductId:   rand.Int(),
+		ProductId:   pId,
 		UserId:      rand.Int(),
 		Description: "Test description for it",
 		Status:      status,

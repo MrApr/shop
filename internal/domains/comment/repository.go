@@ -23,8 +23,9 @@ func (c *CommentRepository) GetComment(cmId int) *Comment {
 
 // GetAllActiveComments and return them
 func (c *CommentRepository) GetAllActiveComments(productId int) []Comment {
-	//TODO implement me
-	panic("implement me")
+	var comments []Comment
+	c.db.Where("product_id = ?", productId).Where("status = ?", true).Find(&comments)
+	return comments
 }
 
 // CreateComment and return it
