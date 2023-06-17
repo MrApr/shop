@@ -173,9 +173,11 @@ func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
 	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
-func (l *LikeDislikeRepository) RemoveLike(productId, UserId int) error {
-	//TODO implement me
-	panic("implement me")
+func (l *LikeDislikeRepository) RemoveLike(productId, userId int) error {
+	return l.db.Delete(&Likes{
+		ProductId: productId,
+		UserId:    userId,
+	}).Error
 }
 
 func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLikes {
