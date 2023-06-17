@@ -262,7 +262,20 @@ func TestLikeDislikeRepository_DislikeProduct(t *testing.T) {
 
 // TestLikeDislikeRepository_DisLikeExists functionality
 func TestLikeDislikeRepository_DisLikeExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createLikeDislikeRepo(conn)
+
+	mockedDislike := mockAndInsertDislike(conn)
+	defer destructDisLike(conn, mockedDislike)
+
+	exists := repo.DisLikeExists(mockedDislike.ProductId, mockedDislike.UserId)
+	assert.True(t, exists, "Expected dislike being exists")
+
+	randWrongUserId := rand.Int()
+	exists = repo.DisLikeExists(mockedDislike.ProductId, randWrongUserId)
+	assert.False(t, exists, "Expected dislike not being exists")
 }
 
 // TestLikeDislikeRepository_RemoveDislike functionality

@@ -191,7 +191,11 @@ func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLike {
 }
 
 func (l *LikeDislikeRepository) DisLikeExists(productId, userId int) bool {
-	panic("implement me")
+	dislike := new(DisLike)
+
+	result := l.db.Where("user_id = ?", userId).Where("product_id = ?", productId).First(dislike)
+
+	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
 func (l *LikeDislikeRepository) RemoveDislike(productId, UserId int) error {
