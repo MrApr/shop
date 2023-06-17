@@ -36,6 +36,12 @@ type PaymentVerifyRequest struct {
 	Authority string `query:"authority" validate:"required,min=36,max=36"`
 }
 
+// GetUserPaymentsRequest is the struct which defines necessary fields for desired operation
+type GetUserPaymentsRequest struct {
+	From *int `json:"from,omitempty" validate:"required,min=1"`
+	To   *int `json:"to,omitempty" validate:"required,min=1,gtefield=From"`
+}
+
 // RequestPaymentResponse defines set of fields in which is returned by payment gateway before starting payment operation and redirecting to bank
 type RequestPaymentResponse struct {
 	Url             string

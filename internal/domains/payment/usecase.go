@@ -3,7 +3,6 @@ package payment
 import (
 	"context"
 	"gorm.io/gorm"
-	"shop/internal/domains/payment/internal"
 	"shop/pkg/advancedError"
 )
 
@@ -21,6 +20,11 @@ func NewPaymentUseCase(svStorage PaymentStorageServiceContract, db *gorm.DB, dec
 		db:               db,
 		tokenDecoder:     decoder,
 	}
+}
+
+// GetUserPayments and return them
+func (p *PaymentUseCase) GetUserPayments(ctx context.Context, token string, request *GetUserPaymentsRequest) ([]Payment, error) {
+	panic("implement me")
 }
 
 // CreatePayment and return it
@@ -105,5 +109,5 @@ func (p *PaymentUseCase) getPaymentSvPGWForUser(paymentId int) (PaymentPGWServic
 	if err != nil {
 		return nil, err
 	}
-	return internal.CreatePaymentGateway(payment.GatewayId, NewPaymentRepo(p.db)), nil
+	return CreatePaymentGateway(payment.GatewayId, NewPaymentRepo(p.db)), nil
 }

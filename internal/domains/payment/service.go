@@ -50,6 +50,11 @@ func (p *PaymentStorageService) GetPayment(id int) (*Payment, error) {
 	return payment, nil
 }
 
+// GetUserPayments and return them based on given user id
+func (p *PaymentStorageService) GetUserPayments(userId, from, to int) ([]Payment, error) {
+	panic("implement me")
+}
+
 // CreatePayment and return it based on given Data
 func (p *PaymentStorageService) CreatePayment(userId, BasketId, addressId, discountId, gatewayId, postTypeId int, totalPrice float64) (*Payment, error) {
 	payment := Payment{
