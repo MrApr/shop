@@ -1,9 +1,9 @@
 CREATE TABLE `likeables`
 (
-    `likeable_id`   INTEGER UNSIGNED NOT NULL,
-    `likeable_type` VARCHAR(255)     NOT NULL,
-    `user_id`       INTEGER UNSIGNED NOT NULL,
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    `product_id` INTEGER UNSIGNED NOT NULL,
+    `user_id`    INTEGER UNSIGNED NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
 );
 
-CREATE INDEX likeables_index ON `likeables` (`likeable_id`, `likeable_type`);
+CREATE UNIQUE INDEX likeables_unique_index ON `likeables` (`product_id`, `user_id`);
