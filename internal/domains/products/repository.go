@@ -1,6 +1,7 @@
 package products
 
 import (
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -163,8 +164,13 @@ func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Likes {
 	return like
 }
 
+// LikeExists checks whether like exists or not
 func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
-	panic("implement me")
+	like := new(Likes)
+
+	result := l.db.Where("user_id = ?", userId).Where("product_id = ?", productId).First(like)
+
+	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
 func (l *LikeDislikeRepository) RemoveLike(productId, UserId int) error {

@@ -193,16 +193,39 @@ func TestLikeDislikeRepository_LikeProduct(t *testing.T) {
 
 	repo := createLikeDislikeRepo(conn)
 
-	productId := 1
-	userId := 5
+	mockedLike := mockLike()
 
-	result := repo.LikeProduct(productId, userId)
-	assert.Equal(t, result.ProductId, productId, "Liking product failed")
-	assert.Equal(t, result.UserId, userId, "Liking product failed")
+	result := repo.LikeProduct(mockedLike.ProductId, mockedLike.UserId)
+	defer destructLike(conn, result)
+	assert.Equal(t, result.ProductId, mockedLike.ProductId, "Liking product failed")
+	assert.Equal(t, result.UserId, mockedLike.UserId, "Liking product failed")
 
 	var tmpLikeProduct Likes
-	err = conn.Where("user_id = ?", userId).Where("product_id = ?", productId).First(&tmpLikeProduct).Error
+	err = conn.Where("user_id = ?", mockedLike.UserId).Where("product_id = ?", mockedLike.ProductId).First(&tmpLikeProduct).Error
 	assert.NoError(t, err, "Liking product failed")
+}
+
+// TestLikeDislikeRepository_LikeExists functionality
+func TestLikeDislikeRepository_LikeExists(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	repo := createLikeDislikeRepo(conn)
+
+	mockedLike := mockAndInsertLike(conn)
+	defer destructLike(conn, mockedLike)
+
+	exists := repo.LikeExists(mockedLike.ProductId, mockedLike.UserId)
+	assert.True(t, exists, "Expected like being exists")
+
+	randWrongUserId := rand.Int()
+	exists = repo.LikeExists(mockedLike.ProductId, randWrongUserId)
+	assert.False(t, exists, "Expected like not being exists")
+}
+
+// TestLikeDislikeRepository_RemoveLike functionality
+func TestLikeDislikeRepository_RemoveLike(t *testing.T) {
+
 }
 
 // createCategoryRepository for testing purpose
@@ -391,4 +414,24 @@ func destructCreatedProducts(db *gorm.DB, products []Product) {
 // createLikeDislikeRepo and return it for testing purpose
 func createLikeDislikeRepo(db *gorm.DB) LikeDislikeRepositoryInterface {
 	return NewLikeDislikeRepository(db)
+}
+
+// mockAndInsertLike in db
+func mockAndInsertLike(db *gorm.DB) *Likes {
+	mockedLike := mockLike()
+	db.Create(mockedLike)
+	return mockedLike
+}
+
+// mockLike and return it
+func mockLike() *Likes {
+	return &Likes{
+		ProductId: 1,
+		UserId:    5,
+	}
+}
+
+// destructLike which is created during testing
+func destructLike(db *gorm.DB, like *Likes) {
+	db.Unscoped().Delete(like)
 }
