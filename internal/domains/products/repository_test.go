@@ -241,6 +241,35 @@ func TestLikeDislikeRepository_RemoveLike(t *testing.T) {
 	assert.Error(t, err, "unliking product failed")
 }
 
+// TestLikeDislikeRepository_DislikeProduct functionality
+func TestLikeDislikeRepository_DislikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	repo := createLikeDislikeRepo(conn)
+
+	mockedDislike := mockDisLike()
+
+	result := repo.DislikeProduct(mockedDislike.ProductId, mockedDislike.UserId)
+	defer destructDisLike(conn, result)
+	assert.Equal(t, result.ProductId, mockedDislike.ProductId, "Disliking product failed")
+	assert.Equal(t, result.UserId, mockedDislike.UserId, "Disliking product failed")
+
+	var tmpDisLikeProduct DisLikes
+	err = conn.Where("user_id = ?", mockedDislike.UserId).Where("product_id = ?", mockedDislike.ProductId).First(&tmpDisLikeProduct).Error
+	assert.NoError(t, err, "Disliking product failed")
+}
+
+// TestLikeDislikeRepository_DisLikeExists functionality
+func TestLikeDislikeRepository_DisLikeExists(t *testing.T) {
+
+}
+
+// TestLikeDislikeRepository_RemoveDislike functionality
+func TestLikeDislikeRepository_RemoveDislike(t *testing.T) {
+
+}
+
 // createCategoryRepository for testing purpose
 func createCategoryRepository(db *gorm.DB) CategoriesRepositoryInterface {
 	return NewCategoryRepo(db)
@@ -447,4 +476,24 @@ func mockLike() *Likes {
 // destructLike which is created during testing
 func destructLike(db *gorm.DB, like *Likes) {
 	db.Unscoped().Delete(like)
+}
+
+// mockAndInsertLike in db
+func mockAndInsertDislike(db *gorm.DB) *DisLikes {
+	mockedDisLike := mockDisLike()
+	db.Create(mockedDisLike)
+	return mockedDisLike
+}
+
+// mockDisLike and return it
+func mockDisLike() *DisLikes {
+	return &DisLikes{
+		ProductId: 1,
+		UserId:    5,
+	}
+}
+
+// destructDisLike which is created during testing
+func destructDisLike(db *gorm.DB, disLike *DisLikes) {
+	db.Unscoped().Delete(disLike)
 }

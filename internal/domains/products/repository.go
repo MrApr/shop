@@ -181,8 +181,13 @@ func (l *LikeDislikeRepository) RemoveLike(productId, userId int) error {
 }
 
 func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLikes {
-	//TODO implement me
-	panic("implement me")
+	var dislike *DisLikes = &DisLikes{
+		ProductId: productId,
+		UserId:    UserId,
+	}
+
+	l.db.Create(dislike)
+	return dislike
 }
 
 func (l *LikeDislikeRepository) DisLikeExists(productId, userId int) bool {
