@@ -149,7 +149,25 @@ func TestLikeDislikeService_LikeProduct(t *testing.T) {
 
 // TestLikeDislikeService_DislikeProduct functionality
 func TestLikeDislikeService_DislikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	sv := createLikeDislikeService(conn)
+	mockedDislike := mockDisLike()
+
+	err = sv.DislikeProduct(mockedDislike.ProductId, mockedDislike.UserId)
+	assert.NoError(t, err, "disliking product in product service failed")
+
+	var tmpDislikeProduct DisLike
+	err = conn.Where("user_id = ?", mockedDislike.UserId).Where("product_id = ?", mockedDislike.ProductId).First(&tmpDislikeProduct).Error
+	assert.NoError(t, err, "disliking product in product service failed")
+
+	//unliking products because like is already exists
+	err = sv.DislikeProduct(mockedDislike.ProductId, mockedDislike.UserId)
+	assert.NoError(t, err, "removing product dislik in product service failed")
+
+	err = conn.Where("user_id = ?", mockedDislike.UserId).Where("product_id = ?", mockedDislike.ProductId).First(&tmpDislikeProduct).Error
+	assert.Error(t, err, "unliking product in product service failed")
 }
 
 // createService and return it for testing purpose

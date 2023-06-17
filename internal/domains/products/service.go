@@ -116,7 +116,16 @@ func (l *LikeDislikeService) LikeProduct(productId, userId int) error {
 	return InternalServerError
 }
 
-func (l *LikeDislikeService) DislikeProduct(productId, UserId int) error {
-	//TODO implement me
-	panic("implement me")
+// DislikeProduct and store it if none exists. If exists remove it
+func (l *LikeDislikeService) DislikeProduct(productId, userId int) error {
+	if l.repo.DisLikeExists(productId, userId) {
+		return l.repo.RemoveDislike(productId, userId)
+	}
+
+	disliked := l.repo.DislikeProduct(productId, userId)
+	if disliked.ProductId == productId && disliked.UserId == userId {
+		return nil
+	}
+
+	return InternalServerError
 }
