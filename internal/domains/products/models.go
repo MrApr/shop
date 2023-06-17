@@ -86,5 +86,4 @@ type DisLike struct {
 // LikeDislikeRequest represent fields which are essential for Like and Dislike Operations
 type LikeDislikeRequest struct {
 	ProductId int `json:"product_id" validate:"required,min=1"`
-	UserId    int `json:"user_id" validate:"required,min=1"`
 }

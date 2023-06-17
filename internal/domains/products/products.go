@@ -70,8 +70,8 @@ type LikeDislikeServiceInterface interface {
 
 // LikeDislikeUseCaseInterface defines set of abstract methods for like and dislike operations
 type LikeDislikeUseCaseInterface interface {
-	LikeProduct(ctx context.Context, request *LikeDislikeRequest) error
-	DislikeProduct(ctx context.Context, request *LikeDislikeRequest) error
+	LikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error
+	DislikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error
 }
 
 // TableName overrides table name for related struct in gorm

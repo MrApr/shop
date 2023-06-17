@@ -17,6 +17,11 @@ type ProductUseCase struct {
 	sv ProductServiceInterface
 }
 
+// LikeDislikeUseCase is the type which implements LikeDislikeUseCaseInterface
+type LikeDislikeUseCase struct {
+	sv LikeDislikeServiceInterface
+}
+
 // defaultOffset defines default starting point for requests
 const defaultOffset int = 0
 
@@ -64,4 +69,22 @@ func (p *ProductUseCase) GetAllProducts(ctx context.Context, request *GetAllProd
 // GetProduct and return it based on given id
 func (p *ProductUseCase) GetProduct(ctx context.Context, id int) (*Product, error) {
 	return p.sv.GetProduct(id)
+}
+
+// NewLikeDislikeUseCase and return it
+func NewLikeDislikeUseCase(sv LikeDislikeServiceInterface) LikeDislikeUseCaseInterface {
+	return &LikeDislikeUseCase{
+		sv: sv,
+	}
+}
+
+// LikeProduct and store it in db
+func (l *LikeDislikeUseCase) LikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error {
+	return l.sv.LikeProduct(request.ProductId, request.UserId)
+}
+
+// DislikeProduct and store it in db
+func (l *LikeDislikeUseCase) DislikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error {
+	//TODO implement me
+	panic("implement me")
 }
