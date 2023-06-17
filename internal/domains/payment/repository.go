@@ -27,6 +27,13 @@ func (p *PaymentRepository) GetPayment(id int) (*Payment, error) {
 	return payment, result.Error
 }
 
+// GetUserPayments and return them based on user-ID
+func (p *PaymentRepository) GetUserPayments(userId, from, limit int) []Payment {
+	var payments []Payment
+	p.db.Where("user_id = ?", userId).Offset(from).Limit(limit).Find(&payments)
+	return payments
+}
+
 // GetUserLastPayment and return it
 func (p *PaymentRepository) GetUserLastPayment(userId int, pendPayment bool) (*Payment, error) {
 	var payment Payment

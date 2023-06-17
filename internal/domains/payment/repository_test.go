@@ -27,6 +27,20 @@ func TestPaymentRepository_GetPayment(t *testing.T) {
 	assert.NotEmptyf(t, result.UpdatedAt, "Payment fetch failed")
 }
 
+// TestPaymentRepository_GetUserPayments functionality
+func TestPaymentRepository_GetUserPayments(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Cannot make connection to database")
+
+	repo := createRepository(conn)
+	payments := mockAndInsertData(conn, 2, false)
+	defer destructPayments(conn, payments)
+	assert.Equal(t, 2, len(payments), "Mocking payments failed")
+
+	result := repo.GetUserPayments(payments[0].UserId, 0, 2)
+	assert.Equal(t, result[0].UserId, payments[0].UserId, "Fetching user payments failed")
+}
+
 // TestPaymentRepository_GetUserLastPayment functionality
 func TestPaymentRepository_GetUserLastPayment(t *testing.T) {
 	conn, err := setupDbConnection()
