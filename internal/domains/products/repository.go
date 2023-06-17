@@ -154,8 +154,13 @@ func NewLikeDislikeRepository(db *gorm.DB) LikeDislikeRepositoryInterface {
 
 // LikeProduct and insert it in db
 func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Likes {
-	//TODO implement me
-	panic("implement me")
+	var like *Likes = &Likes{
+		ProductId: productId,
+		UserId:    UserId,
+	}
+
+	l.db.Create(like)
+	return like
 }
 
 func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {

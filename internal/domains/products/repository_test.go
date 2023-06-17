@@ -186,6 +186,25 @@ func TestProductRepository_UpdateProduct(t *testing.T) {
 	assert.Equal(t, tmpProduct.Code, newCode, "product update failed")
 }
 
+// TestLikeDislikeRepository_LikeProduct functionality
+func TestLikeDislikeRepository_LikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	repo := createLikeDislikeRepo(conn)
+
+	productId := 1
+	userId := 5
+
+	result := repo.LikeProduct(productId, userId)
+	assert.Equal(t, result.ProductId, productId, "Liking product failed")
+	assert.Equal(t, result.UserId, userId, "Liking product failed")
+
+	var tmpLikeProduct Likes
+	err = conn.Where("user_id = ?", userId).Where("product_id = ?", productId).First(&tmpLikeProduct).Error
+	assert.NoError(t, err, "Liking product failed")
+}
+
 // createCategoryRepository for testing purpose
 func createCategoryRepository(db *gorm.DB) CategoriesRepositoryInterface {
 	return NewCategoryRepo(db)
@@ -197,7 +216,7 @@ func setupDbConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(Type{}, Category{}, Product{})
+	err = db.AutoMigrate(Type{}, Category{}, Product{}, Likes{}, DisLikes{})
 	return db, err
 }
 
@@ -367,4 +386,9 @@ func destructCreatedProducts(db *gorm.DB, products []Product) {
 	for _, product := range products {
 		db.Unscoped().Delete(product)
 	}
+}
+
+// createLikeDislikeRepo and return it for testing purpose
+func createLikeDislikeRepo(db *gorm.DB) LikeDislikeRepositoryInterface {
+	return NewLikeDislikeRepository(db)
 }

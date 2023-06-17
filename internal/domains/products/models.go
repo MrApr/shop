@@ -45,8 +45,8 @@ type GetAllCategoriesRequest struct {
 type Product struct {
 	Id          int        `json:"id" gorm:"primaryKey"`
 	Categories  []Category `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
-	Likes       []Likes    `json:"likes,omitempty" gorm:"many2many:likes;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:UserId"`
-	Dislikes    []DisLikes `json:"dislikes,omitempty" gorm:"many2many:dislikes;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:UserId"`
+	Likes       []Likes    `json:"likes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
+	Dislikes    []DisLikes `json:"dislikes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
 	Title       string     `json:"title" gorm:"index"`
 	Code        int        `json:"code" gorm:"uniqueIndex"`
 	Amount      int        `json:"amount"`
