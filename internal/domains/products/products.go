@@ -51,3 +51,23 @@ type ProductUseCaseInterface interface {
 	GetAllProducts(ctx context.Context, request *GetAllProductsRequest) ([]Product, error)
 	GetProduct(ctx context.Context, id int) (*Product, error)
 }
+
+// LikeDislikeRepositoryInterface defines set of abstract methods for like and dislike operations
+type LikeDislikeRepositoryInterface interface {
+	LikeProduct(productId, UserId int) Likes
+	RemoveLike(productId, UserId int) error
+	DislikeProduct(productId, UserId int) DisLikes
+	RemoveDislike(productId, UserId int) error
+}
+
+// LikeDislikeServiceInterface defines set of abstract methods for like and dislike operations
+type LikeDislikeServiceInterface interface {
+	LikeProduct(productId, UserId int) error
+	DislikeProduct(productId, UserId int) error
+}
+
+// LikeDislikeUseCaseInterface defines set of abstract methods for like and dislike operations
+type LikeDislikeUseCaseInterface interface {
+	LikeProduct(ctx context.Context, request *LikeDislikeRequest) error
+	DislikeProduct(ctx context.Context, request *LikeDislikeRequest) error
+}
