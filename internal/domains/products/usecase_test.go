@@ -100,16 +100,30 @@ func TestLikeDislikeUseCase_LikeProduct(t *testing.T) {
 	ctx := context.Background()
 
 	err = uc.LikeProduct(ctx, "", mockedLikeDislikeRequest)
-	assert.NoError(t, err, "liking product in product service failed")
+	assert.NoError(t, err, "liking product in product usecase failed")
 
 	var tmpLikeProduct Like
+	defer destructLike(conn, &tmpLikeProduct)
 	err = conn.Where("user_id = ?", 5).Where("product_id = ?", mockedLikeDislikeRequest.ProductId).First(&tmpLikeProduct).Error
-	assert.NoError(t, err, "Liking product in product service failed")
+	assert.NoError(t, err, "Liking product in product usecase failed")
 }
 
 // TestLikeDislikeUseCase_DislikeProduct functionality
 func TestLikeDislikeUseCase_DislikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	uc := createLikeDislikeUseCase(conn)
+	mockedLikeDislikeRequest := mockLikeDislikeRequest()
+	ctx := context.Background()
+
+	err = uc.DislikeProduct(ctx, "", mockedLikeDislikeRequest)
+	assert.NoError(t, err, "disliking product in product usecase failed")
+
+	var tmpDislikeProduct DisLike
+	defer destructDisLike(conn, &tmpDislikeProduct)
+	err = conn.Where("user_id = ?", 5).Where("product_id = ?", mockedLikeDislikeRequest.ProductId).First(&tmpDislikeProduct).Error
+	assert.NoError(t, err, "disliking product in product usecase failed")
 }
 
 // createUseCase and return it for testing

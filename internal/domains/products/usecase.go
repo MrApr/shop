@@ -100,6 +100,10 @@ func (l *LikeDislikeUseCase) LikeProduct(ctx context.Context, token string, requ
 
 // DislikeProduct and store it in db
 func (l *LikeDislikeUseCase) DislikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error {
-	//TODO implement me
-	panic("implement me")
+	userId, err := l.decoderFn(ctx, token)
+	if err != nil {
+		return advancedError.New(err, "Decoding token failed")
+	}
+
+	return l.sv.DislikeProduct(request.ProductId, userId)
 }
