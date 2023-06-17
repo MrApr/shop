@@ -24,7 +24,12 @@ func NewPaymentUseCase(svStorage PaymentStorageServiceContract, db *gorm.DB, dec
 
 // GetUserPayments and return them
 func (p *PaymentUseCase) GetUserPayments(ctx context.Context, token string, request *GetUserPaymentsRequest) ([]Payment, error) {
-	panic("implement me")
+	userId, err := p.tokenDecoder(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.paymentSvStorage.GetUserPayments(userId, *request.From, *request.To)
 }
 
 // CreatePayment and return it
