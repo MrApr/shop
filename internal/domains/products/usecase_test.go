@@ -90,6 +90,28 @@ func TestProductUseCase_GetProduct(t *testing.T) {
 	assertProducts(t, mockedProducts, []Product{*product})
 }
 
+// TestLikeDislikeUseCase_LikeProduct functionality
+func TestLikeDislikeUseCase_LikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	uc := createLikeDislikeUseCase(conn)
+	mockedLikeDislikeRequest := mockLikeDislikeRequest()
+	ctx := context.Background()
+
+	err = uc.LikeProduct(ctx, "", mockedLikeDislikeRequest)
+	assert.NoError(t, err, "liking product in product service failed")
+
+	var tmpLikeProduct Like
+	err = conn.Where("user_id = ?", 5).Where("product_id = ?", mockedLikeDislikeRequest.ProductId).First(&tmpLikeProduct).Error
+	assert.NoError(t, err, "Liking product in product service failed")
+}
+
+// TestLikeDislikeUseCase_DislikeProduct functionality
+func TestLikeDislikeUseCase_DislikeProduct(t *testing.T) {
+
+}
+
 // createUseCase and return it for testing
 func createUseCase(db *gorm.DB) CategoryUseCaseInterface {
 	return NewCategoryUseCase(NewCategoryService(NewCategoryRepo(db)))
@@ -103,6 +125,13 @@ func createTypeUseCase(db *gorm.DB) TypeUseCaseInterface {
 // createProductUseCase and return it
 func createProductUseCase(db *gorm.DB) ProductUseCaseInterface {
 	return NewProductUseCase(NewProductsService(NewProductRepository(db)))
+}
+
+// createLikeDislikeUseCase and return it
+func createLikeDislikeUseCase(db *gorm.DB) LikeDislikeUseCaseInterface {
+	return NewLikeDislikeUseCase(NewLikeDislikeService(NewLikeDislikeRepository(db)), func(ctx context.Context, token string) (int, error) {
+		return 5, nil
+	})
 }
 
 // GetAllTypesRequest and return it
@@ -138,5 +167,12 @@ func mockEmptyGetAllProductsRequest() *GetAllProductsRequest {
 		MaxPrice:    nil,
 		Limit:       nil,
 		Offset:      0,
+	}
+}
+
+// mockLikeDislikeRequest for testing purpose
+func mockLikeDislikeRequest() *LikeDislikeRequest {
+	return &LikeDislikeRequest{
+		ProductId: 1,
 	}
 }

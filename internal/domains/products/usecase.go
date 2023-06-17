@@ -1,6 +1,10 @@
 package products
 
-import "context"
+import (
+	"context"
+	"shop/pkg/advancedError"
+	"shop/pkg/userHandler"
+)
 
 // CategoriesUseCase is categories use case struct
 type CategoriesUseCase struct {
@@ -19,7 +23,8 @@ type ProductUseCase struct {
 
 // LikeDislikeUseCase is the type which implements LikeDislikeUseCaseInterface
 type LikeDislikeUseCase struct {
-	sv LikeDislikeServiceInterface
+	sv        LikeDislikeServiceInterface
+	decoderFn func(ctx context.Context, token string) (int, error)
 }
 
 // defaultOffset defines default starting point for requests
@@ -72,15 +77,25 @@ func (p *ProductUseCase) GetProduct(ctx context.Context, id int) (*Product, erro
 }
 
 // NewLikeDislikeUseCase and return it
-func NewLikeDislikeUseCase(sv LikeDislikeServiceInterface) LikeDislikeUseCaseInterface {
+func NewLikeDislikeUseCase(sv LikeDislikeServiceInterface, decoderFn func(ctx context.Context, token string) (int, error)) LikeDislikeUseCaseInterface {
+	if decoderFn == nil {
+		decoderFn = userHandler.ExtractUserIdFromToken
+	}
+
 	return &LikeDislikeUseCase{
-		sv: sv,
+		sv:        sv,
+		decoderFn: decoderFn,
 	}
 }
 
 // LikeProduct and store it in db
 func (l *LikeDislikeUseCase) LikeProduct(ctx context.Context, token string, request *LikeDislikeRequest) error {
-	return l.sv.LikeProduct(request.ProductId, request.UserId)
+	userId, err := l.decoderFn(ctx, token)
+	if err != nil {
+		return advancedError.New(err, "Decoding token failed")
+	}
+
+	return l.sv.LikeProduct(request.ProductId, userId)
 }
 
 // DislikeProduct and store it in db
