@@ -124,6 +124,34 @@ func TestProductService_UpdateProductInventory(t *testing.T) {
 	assert.Equal(t, updatedProduct.Id, mockedProducts[0].Id, "product service updating product failed")
 }
 
+// TestLikeDislikeService_LikeProduct functionality
+func TestLikeDislikeService_LikeProduct(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
+
+	sv := createLikeDislikeService(conn)
+	mockedLike := mockLike()
+
+	err = sv.LikeProduct(mockedLike.ProductId, mockedLike.UserId)
+	assert.NoError(t, err, "liking product in product service failed")
+
+	var tmpLikeProduct Like
+	err = conn.Where("user_id = ?", mockedLike.UserId).Where("product_id = ?", mockedLike.ProductId).First(&tmpLikeProduct).Error
+	assert.NoError(t, err, "Liking product in product service failed")
+
+	//unliking products because like is already exists
+	err = sv.LikeProduct(mockedLike.ProductId, mockedLike.UserId)
+	assert.NoError(t, err, "unliking product in product service failed")
+
+	err = conn.Where("user_id = ?", mockedLike.UserId).Where("product_id = ?", mockedLike.ProductId).First(&tmpLikeProduct).Error
+	assert.Error(t, err, "unliking product in product service failed")
+}
+
+// TestLikeDislikeService_DislikeProduct functionality
+func TestLikeDislikeService_DislikeProduct(t *testing.T) {
+
+}
+
 // createService and return it for testing purpose
 func createService(db *gorm.DB) CategoryServiceInterface {
 	return NewCategoryService(NewCategoryRepo(db))
@@ -137,4 +165,9 @@ func createTypeService(db *gorm.DB) TypeServiceInterface {
 // createProductService and return it for testing purpose
 func createProductService(db *gorm.DB) ProductServiceInterface {
 	return NewProductsService(NewProductRepository(db))
+}
+
+// createLikeDislikeService and return it for testing purpose
+func createLikeDislikeService(db *gorm.DB) LikeDislikeServiceInterface {
+	return NewLikeDislikeService(NewLikeDislikeRepository(db))
 }

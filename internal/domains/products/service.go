@@ -15,6 +15,11 @@ type ProductService struct {
 	repo ProductsRepositoryInterface
 }
 
+// LikeDislikeService is a struct which implements LikeDislikeServiceInterface
+type LikeDislikeService struct {
+	repo LikeDislikeRepositoryInterface
+}
+
 // NewCategoryService and return it
 func NewCategoryService(repo CategoriesRepositoryInterface) CategoryServiceInterface {
 	return &CategoryService{
@@ -88,4 +93,30 @@ func (p *ProductService) UpdateProductInventory(productId, newInventory int) (*P
 	}
 
 	return product, nil
+}
+
+// NewLikeDislikeService and return it
+func NewLikeDislikeService(repo LikeDislikeRepositoryInterface) LikeDislikeServiceInterface {
+	return &LikeDislikeService{
+		repo: repo,
+	}
+}
+
+// LikeProduct and store it if none exists. If exists remove it
+func (l *LikeDislikeService) LikeProduct(productId, userId int) error {
+	if l.repo.LikeExists(productId, userId) {
+		return l.repo.RemoveLike(productId, userId)
+	}
+
+	liked := l.repo.LikeProduct(productId, userId)
+	if liked.ProductId == productId && liked.UserId == userId {
+		return nil
+	}
+
+	return InternalServerError
+}
+
+func (l *LikeDislikeService) DislikeProduct(productId, UserId int) error {
+	//TODO implement me
+	panic("implement me")
 }
