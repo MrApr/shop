@@ -73,3 +73,13 @@ type LikeDislikeUseCaseInterface interface {
 	LikeProduct(ctx context.Context, request *LikeDislikeRequest) error
 	DislikeProduct(ctx context.Context, request *LikeDislikeRequest) error
 }
+
+// TableName overrides table name for related struct in gorm
+func (DisLike) TableName() string {
+	return "dislikes"
+}
+
+// TableName overrides table name for related struct in gorm
+func (Like) TableName() string {
+	return "likes"
+}
