@@ -173,6 +173,7 @@ func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
 	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
+// RemoveLike for a product which exists
 func (l *LikeDislikeRepository) RemoveLike(productId, userId int) error {
 	return l.db.Delete(&Like{
 		ProductId: productId,
@@ -180,6 +181,7 @@ func (l *LikeDislikeRepository) RemoveLike(productId, userId int) error {
 	}).Error
 }
 
+// DislikeProduct and insert it in db
 func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLike {
 	var dislike *DisLike = &DisLike{
 		ProductId: productId,
@@ -190,6 +192,7 @@ func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLike {
 	return dislike
 }
 
+// DisLikeExists checking
 func (l *LikeDislikeRepository) DisLikeExists(productId, userId int) bool {
 	dislike := new(DisLike)
 
@@ -198,7 +201,10 @@ func (l *LikeDislikeRepository) DisLikeExists(productId, userId int) bool {
 	return result.Error == nil && !errors.Is(result.Error, gorm.ErrRecordNotFound)
 }
 
-func (l *LikeDislikeRepository) RemoveDislike(productId, UserId int) error {
-	//TODO implement me
-	panic("implement me")
+// RemoveDislike which exists in db
+func (l *LikeDislikeRepository) RemoveDislike(productId, userId int) error {
+	return l.db.Delete(&DisLike{
+		ProductId: productId,
+		UserId:    userId,
+	}).Error
 }

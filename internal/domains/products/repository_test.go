@@ -280,7 +280,20 @@ func TestLikeDislikeRepository_DisLikeExists(t *testing.T) {
 
 // TestLikeDislikeRepository_RemoveDislike functionality
 func TestLikeDislikeRepository_RemoveDislike(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Setting up database connection failed")
 
+	repo := createLikeDislikeRepo(conn)
+
+	mockedDislike := mockAndInsertDislike(conn)
+	defer destructDisLike(conn, mockedDislike)
+
+	err = repo.RemoveDislike(mockedDislike.ProductId, mockedDislike.UserId)
+	assert.NoError(t, err, "unliking product failed")
+
+	var tmpDislikeProduct DisLike
+	err = conn.Where("user_id = ?", mockedDislike.UserId).Where("product_id = ?", mockedDislike.ProductId).First(&tmpDislikeProduct).Error
+	assert.Error(t, err, "unliking product failed")
 }
 
 // createCategoryRepository for testing purpose
