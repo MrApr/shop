@@ -200,7 +200,7 @@ func TestLikeDislikeRepository_LikeProduct(t *testing.T) {
 	assert.Equal(t, result.ProductId, mockedLike.ProductId, "Liking product failed")
 	assert.Equal(t, result.UserId, mockedLike.UserId, "Liking product failed")
 
-	var tmpLikeProduct Likes
+	var tmpLikeProduct Like
 	err = conn.Where("user_id = ?", mockedLike.UserId).Where("product_id = ?", mockedLike.ProductId).First(&tmpLikeProduct).Error
 	assert.NoError(t, err, "Liking product failed")
 }
@@ -236,7 +236,7 @@ func TestLikeDislikeRepository_RemoveLike(t *testing.T) {
 	err = repo.RemoveLike(mockedLike.ProductId, mockedLike.UserId)
 	assert.NoError(t, err, "unliking product failed")
 
-	var tmpLikeProduct Likes
+	var tmpLikeProduct Like
 	err = conn.Where("user_id = ?", mockedLike.UserId).Where("product_id = ?", mockedLike.ProductId).First(&tmpLikeProduct).Error
 	assert.Error(t, err, "unliking product failed")
 }
@@ -255,7 +255,7 @@ func TestLikeDislikeRepository_DislikeProduct(t *testing.T) {
 	assert.Equal(t, result.ProductId, mockedDislike.ProductId, "Disliking product failed")
 	assert.Equal(t, result.UserId, mockedDislike.UserId, "Disliking product failed")
 
-	var tmpDisLikeProduct DisLikes
+	var tmpDisLikeProduct DisLike
 	err = conn.Where("user_id = ?", mockedDislike.UserId).Where("product_id = ?", mockedDislike.ProductId).First(&tmpDisLikeProduct).Error
 	assert.NoError(t, err, "Disliking product failed")
 }
@@ -281,7 +281,7 @@ func setupDbConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(Type{}, Category{}, Product{}, Likes{}, DisLikes{})
+	err = db.AutoMigrate(Type{}, Category{}, Product{}, Like{}, DisLike{})
 	return db, err
 }
 
@@ -459,41 +459,41 @@ func createLikeDislikeRepo(db *gorm.DB) LikeDislikeRepositoryInterface {
 }
 
 // mockAndInsertLike in db
-func mockAndInsertLike(db *gorm.DB) *Likes {
+func mockAndInsertLike(db *gorm.DB) *Like {
 	mockedLike := mockLike()
 	db.Create(mockedLike)
 	return mockedLike
 }
 
 // mockLike and return it
-func mockLike() *Likes {
-	return &Likes{
+func mockLike() *Like {
+	return &Like{
 		ProductId: 1,
 		UserId:    5,
 	}
 }
 
 // destructLike which is created during testing
-func destructLike(db *gorm.DB, like *Likes) {
+func destructLike(db *gorm.DB, like *Like) {
 	db.Unscoped().Delete(like)
 }
 
 // mockAndInsertLike in db
-func mockAndInsertDislike(db *gorm.DB) *DisLikes {
+func mockAndInsertDislike(db *gorm.DB) *DisLike {
 	mockedDisLike := mockDisLike()
 	db.Create(mockedDisLike)
 	return mockedDisLike
 }
 
 // mockDisLike and return it
-func mockDisLike() *DisLikes {
-	return &DisLikes{
+func mockDisLike() *DisLike {
+	return &DisLike{
 		ProductId: 1,
 		UserId:    5,
 	}
 }
 
 // destructDisLike which is created during testing
-func destructDisLike(db *gorm.DB, disLike *DisLikes) {
+func destructDisLike(db *gorm.DB, disLike *DisLike) {
 	db.Unscoped().Delete(disLike)
 }

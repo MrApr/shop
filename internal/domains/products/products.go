@@ -54,10 +54,10 @@ type ProductUseCaseInterface interface {
 
 // LikeDislikeRepositoryInterface defines set of abstract methods for like and dislike operations
 type LikeDislikeRepositoryInterface interface {
-	LikeProduct(productId, userId int) *Likes
+	LikeProduct(productId, userId int) *Like
 	LikeExists(productId, userId int) bool
 	RemoveLike(productId, userId int) error
-	DislikeProduct(productId, userId int) *DisLikes
+	DislikeProduct(productId, userId int) *DisLike
 	DisLikeExists(productId, userId int) bool
 	RemoveDislike(productId, userId int) error
 }

@@ -154,8 +154,8 @@ func NewLikeDislikeRepository(db *gorm.DB) LikeDislikeRepositoryInterface {
 }
 
 // LikeProduct and insert it in db
-func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Likes {
-	var like *Likes = &Likes{
+func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Like {
+	var like *Like = &Like{
 		ProductId: productId,
 		UserId:    UserId,
 	}
@@ -166,7 +166,7 @@ func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Likes {
 
 // LikeExists checks whether like exists or not
 func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
-	like := new(Likes)
+	like := new(Like)
 
 	result := l.db.Where("user_id = ?", userId).Where("product_id = ?", productId).First(like)
 
@@ -174,14 +174,14 @@ func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
 }
 
 func (l *LikeDislikeRepository) RemoveLike(productId, userId int) error {
-	return l.db.Delete(&Likes{
+	return l.db.Delete(&Like{
 		ProductId: productId,
 		UserId:    userId,
 	}).Error
 }
 
-func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLikes {
-	var dislike *DisLikes = &DisLikes{
+func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLike {
+	var dislike *DisLike = &DisLike{
 		ProductId: productId,
 		UserId:    UserId,
 	}
