@@ -1,4 +1,4 @@
-package zarinpal
+package payment
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"github.com/sinabakh/go-zarinpal-checkout"
 	"log"
 	"os"
-	"shop/internal/domains/payment"
 	"shop/pkg/advancedError"
 	"shop/pkg/paymentHandler"
 )
@@ -23,13 +22,13 @@ var ENVAreNotSet error = errors.New("Environment variables are not set completel
 
 // ZarinpalPGW defines set of methods which implements payment gateway payment contract
 type ZarinpalPGW struct {
-	repo       payment.PaymentRepoContract
+	repo       PaymentRepoContract
 	key        string
 	zarinPalPG *zarinpal.Zarinpal
 }
 
 // NewZarinpal creates and returns zarinpal implementation
-func NewZarinpal(repo payment.PaymentRepoContract, isSandBox bool) payment.PaymentPGWServiceContract {
+func NewZarinpal(repo PaymentRepoContract, isSandBox bool) PaymentPGWServiceContract {
 	merchantId := paymentHandler.GetGatewayToken(gatewayName)
 	if merchantId == "" {
 		log.Fatalf("%s", "Required enviroment variable for zarinpal is not set properly")
@@ -47,7 +46,7 @@ func NewZarinpal(repo payment.PaymentRepoContract, isSandBox bool) payment.Payme
 }
 
 // Pay operates payment
-func (zp *ZarinpalPGW) Pay(paymentId int) (*payment.RequestPaymentResponse, error) {
+func (zp *ZarinpalPGW) Pay(paymentId int) (*RequestPaymentResponse, error) {
 	requestedPayment, err := zp.repo.GetPayment(paymentId)
 	if err != nil {
 		return nil, err
@@ -69,7 +68,7 @@ func (zp *ZarinpalPGW) Pay(paymentId int) (*payment.RequestPaymentResponse, erro
 		return nil, advancedError.New(err, "Cannot update payment authority")
 	}
 
-	return &payment.RequestPaymentResponse{
+	return &RequestPaymentResponse{
 		Url:             url,
 		Key:             auth,
 		OperationStatus: status,
@@ -77,7 +76,7 @@ func (zp *ZarinpalPGW) Pay(paymentId int) (*payment.RequestPaymentResponse, erro
 }
 
 // Verify done payment by user
-func (zp *ZarinpalPGW) Verify(paymentId int, Authority string) (*payment.Payment, error) {
+func (zp *ZarinpalPGW) Verify(paymentId int, Authority string) (*Payment, error) {
 	requestedPayment, err := zp.repo.GetPayment(paymentId)
 	if err != nil {
 		return nil, err
@@ -111,8 +110,8 @@ func (zp *ZarinpalPGW) createReturnUrl(paymentId int) (string, error) {
 // getPaymentStatusStr based on given bool
 func (zp *ZarinpalPGW) getPaymentStatusStr(status bool) string {
 	if status {
-		return payment.PaymentSuccessStatus
+		return PaymentSuccessStatus
 	}
 
-	return payment.PaymentFailureStatus
+	return PaymentFailureStatus
 }
