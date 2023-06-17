@@ -45,6 +45,8 @@ type GetAllCategoriesRequest struct {
 type Product struct {
 	Id          int        `json:"id" gorm:"primaryKey"`
 	Categories  []Category `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
+	Likes       []Likes    `json:"likes,omitempty" gorm:"many2many:likes;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:UserId"`
+	Dislikes    []DisLikes `json:"dislikes,omitempty" gorm:"many2many:dislikes;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:UserId"`
 	Title       string     `json:"title" gorm:"index"`
 	Code        int        `json:"code" gorm:"uniqueIndex"`
 	Amount      int        `json:"amount"`
@@ -67,4 +69,16 @@ type GetAllProductsRequest struct {
 	MaxPrice    *float64 `json:"max_price,omitempty" validate:"omitempty:min=1;gtefield:MinPrice"`
 	Limit       *int     `json:"limit,omitempty" validate:"omitempty:min=1"`
 	Offset      int      `json:"offset" validate:"omitempty:min=1"`
+}
+
+// Likes determines Likes entity in system
+type Likes struct {
+	ProductId int `json:"product_id" gorm:"primaryKey"`
+	UserId    int `json:"user_id" gorm:"primaryKey"`
+}
+
+// DisLikes determines DisLikes entity in system
+type DisLikes struct {
+	ProductId int `json:"product_id" gorm:"primaryKey"`
+	UserId    int `json:"user_id" gorm:"primaryKey"`
 }
