@@ -31,6 +31,31 @@ func TestPaymentStorageService_GetPayment(t *testing.T) {
 	assert.ErrorIs(t, err, PaymentNotFound, "Expected error on fetching payment with random wrong id")
 }
 
+// TestPaymentStorageService_GetUserPayments functionality
+func TestPaymentStorageService_GetUserPayments(t *testing.T) {
+	conn, err := setupDbConnection()
+	assert.NoError(t, err, "Cannot make connection to database")
+
+	sv := createPaymentService(conn, false)
+	payments := mockAndInsertData(conn, 2, false)
+	defer destructPayments(conn, payments)
+	assert.Equal(t, 2, len(payments), "Mocking payments failed")
+
+	result, err := sv.GetUserPayments(payments[0].UserId, 0, 10)
+	assert.NoError(t, err, "Fetching user payments failed")
+
+	assert.Equal(t, result[0].UserId, payments[0].UserId, "Fetching user payments failed !")
+
+	randWrongId := rand.Int()
+	_, err = sv.GetUserPayments(randWrongId, 0, 10)
+	assert.Error(t, err, "Expected error on fetching payment with random wrong id")
+	assert.ErrorIs(t, err, PaymentNotFound, "Expected error on fetching payment with random wrong id")
+
+	_, err = sv.GetUserPayments(payments[0].UserId, 20, 10)
+	assert.Error(t, err, "Expected error on fetching payment with random wrong id")
+	assert.ErrorIs(t, err, PaymentNotFound, "Expected error on fetching payment with random wrong id")
+}
+
 // TestPaymentService_CreatePayment functionality
 func TestPaymentService_CreatePayment(t *testing.T) {
 	conn, err := setupDbConnection()

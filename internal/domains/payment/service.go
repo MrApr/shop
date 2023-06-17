@@ -5,6 +5,9 @@ import (
 	"shop/pkg/paymentHandler"
 )
 
+// itemsAllowedPerPage defines per page items count for get all functions
+const itemsAllowedPerPage int = 10
+
 // PaymentStorageService struct which implements PaymentStorageServiceContract
 type PaymentStorageService struct {
 	repo              PaymentRepoContract
@@ -52,7 +55,17 @@ func (p *PaymentStorageService) GetPayment(id int) (*Payment, error) {
 
 // GetUserPayments and return them based on given user id
 func (p *PaymentStorageService) GetUserPayments(userId, from, to int) ([]Payment, error) {
-	panic("implement me")
+	var offset int = to
+	if (from - to) > itemsAllowedPerPage {
+		offset = itemsAllowedPerPage
+	}
+
+	payments := p.repo.GetUserPayments(userId, from, offset)
+	if len(payments) == 0 {
+		return nil, PaymentNotFound
+	}
+
+	return payments, nil
 }
 
 // CreatePayment and return it based on given Data
