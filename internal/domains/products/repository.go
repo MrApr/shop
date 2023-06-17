@@ -19,6 +19,11 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
+// LikeDislikeRepository implements LikeDislikeRepositoryInterface
+type LikeDislikeRepository struct {
+	db *gorm.DB
+}
+
 // NewCategoryRepo creates and returns a new instance of category repository
 func NewCategoryRepo(db *gorm.DB) CategoriesRepositoryInterface {
 	return &CategoryRepository{
@@ -138,4 +143,40 @@ func (p *ProductRepository) GetProduct(id int) *Product {
 // UpdateProduct which is already exists
 func (p *ProductRepository) UpdateProduct(product *Product) error {
 	return p.db.Save(product).Error
+}
+
+// NewLikeDislikeRepository and return it
+func NewLikeDislikeRepository(db *gorm.DB) LikeDislikeRepositoryInterface {
+	return &LikeDislikeRepository{
+		db: db,
+	}
+}
+
+// LikeProduct and insert it in db
+func (l *LikeDislikeRepository) LikeProduct(productId, UserId int) *Likes {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (l *LikeDislikeRepository) LikeExists(productId, userId int) bool {
+	panic("implement me")
+}
+
+func (l *LikeDislikeRepository) RemoveLike(productId, UserId int) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (l *LikeDislikeRepository) DislikeProduct(productId, UserId int) *DisLikes {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (l *LikeDislikeRepository) DisLikeExists(productId, userId int) bool {
+	panic("implement me")
+}
+
+func (l *LikeDislikeRepository) RemoveDislike(productId, UserId int) error {
+	//TODO implement me
+	panic("implement me")
 }
