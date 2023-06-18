@@ -27,6 +27,7 @@ func AttachProductHandlerToProductDomain(engine *echo.Echo, db *gorm.DB) {
 func setupProductRoutes(engine *echo.Echo, handler *productEchoHandler) {
 	router := engine.Group("products")
 	router.GET("", handler.GetAllProducts)
+	router.GET("/:id", handler.GetProduct)
 }
 
 // GetAllProducts and return them
