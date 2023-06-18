@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"shop/internal/domains/payment"
 	"shop/internal/middleware/auth"
+	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 	"strconv"
 )
@@ -41,6 +42,7 @@ func setupPaymentDomains(echoEngine *echo.Echo, paymentHandlr *PaymentHandler) {
 	group.Use(auth.ValidateJWT)
 
 	group.GET("/:id", paymentHandlr.Pay)
+	group.GET("", paymentHandlr.GetUserPayments)
 }
 
 // Pay operates created payment for user
@@ -55,7 +57,10 @@ func (pH *PaymentHandler) Pay(e echo.Context) error {
 		return e.JSON(http.StatusInternalServerError, generateResponse(nil, paymentIdConversionErr))
 	}
 
-	bearerToken := e.Request().Header.Get("Authorization")
+	bearerToken, err := reqTokenHandler.ExtractBearerToken(e.Request())
+	if err != nil {
+		return e.JSON(http.StatusForbidden, generateResponse(nil, err))
+	}
 	ctx := context.Background()
 
 	requestResult, err := pH.uC.Pay(ctx, bearerToken, paymentIdInt)
@@ -63,6 +68,33 @@ func (pH *PaymentHandler) Pay(e echo.Context) error {
 		return e.JSON(http.StatusInternalServerError, generateResponse(nil, err))
 	}
 	return e.Redirect(http.StatusMovedPermanently, requestResult.Url) //Todo store payment results in log collector
+}
+
+// GetUserPayments and return them
+func (pH *PaymentHandler) GetUserPayments(e echo.Context) error {
+	request := new(payment.GetUserPaymentsRequest)
+
+	if err := e.Bind(request); err != nil {
+		return e.JSON(http.StatusBadRequest, generateResponse(nil, err))
+	}
+
+	if errs := validation.Validate(request); errs != nil {
+		return e.JSON(http.StatusBadRequest, generateResponse(nil, errs))
+	}
+
+	bearerToken, err := reqTokenHandler.ExtractBearerToken(e.Request())
+	if err != nil {
+		return e.JSON(http.StatusForbidden, generateResponse(nil, err))
+	}
+
+	ctx := context.Background()
+
+	payments, err := pH.uC.GetUserPayments(ctx, bearerToken, request)
+	if err != nil {
+		return e.JSON(http.StatusNotFound, generateResponse(nil, err))
+	}
+
+	return e.JSON(http.StatusOK, generateResponse(payments, nil))
 }
 
 // Verify user payment that is done
@@ -82,7 +114,11 @@ func (pH *PaymentHandler) Verify(e echo.Context) error {
 		return e.JSON(http.StatusBadRequest, generateResponse(nil, invalidPaymentUrl))
 	}
 
-	bearerToken := e.Request().Header.Get("Authorization")
+	bearerToken, err := reqTokenHandler.ExtractBearerToken(e.Request())
+	if err != nil {
+		return e.JSON(http.StatusForbidden, generateResponse(nil, err))
+	}
+
 	ctx := context.Background()
 
 	verifiedPayment, err := pH.uC.Verify(ctx, bearerToken, paymentRequest)
