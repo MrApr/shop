@@ -15,13 +15,15 @@ var noBearerProvided error = errors.New("no bearer token passed by client")
 func ExtractBearerToken(req *http.Request) (string, error) {
 	bearerToken := req.Header.Get(bearerTokenKeyIndicator)
 
-	if bearerToken == "" {
-		bearerToken = req.Header.Get(strings.ToLower(bearerTokenKeyIndicator))
+	if bearerToken != "" {
+		goto EndLine
 	}
 
+	bearerToken = req.Header.Get(strings.ToLower(bearerTokenKeyIndicator))
 	if bearerToken == "" {
 		return "", noBearerProvided
 	}
 
+EndLine:
 	return bearerToken, nil
 }
