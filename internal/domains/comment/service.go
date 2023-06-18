@@ -40,10 +40,14 @@ func (c *CommentService) CreateComment(userId, productId int, description string
 }
 
 // DeleteComment and which exists in db
-func (c *CommentService) DeleteComment(cmId int) error {
+func (c *CommentService) DeleteComment(cmId, userId int) error {
 	comment := c.repo.GetComment(cmId)
 	if comment.Id == 0 {
 		return CommentNotFound
+	}
+
+	if comment.UserId != userId {
+		return OperationNotAllowed
 	}
 
 	return c.repo.DeleteComment(comment)

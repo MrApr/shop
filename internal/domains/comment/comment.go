@@ -14,12 +14,12 @@ type CommentRepositoryInterface interface {
 type CommentServiceInterface interface {
 	GetAllActiveComments(productId int) ([]Comment, error)
 	CreateComment(userId, productId int, description string) (*Comment, error)
-	DeleteComment(cmId int) error
+	DeleteComment(cmId, userId int) error
 }
 
 // CommentUseCaseInterface defines set of methods which every type who wants to play role as comment use-case should obey
 type CommentUseCaseInterface interface {
 	GetAllActiveComments(ctx context.Context, productId int) ([]Comment, error)
 	CreateComment(ctx context.Context, token string, request *CreateCommentRequest) (*Comment, error)
-	DeleteComment(ctx context.Context, cmId int) error
+	DeleteComment(ctx context.Context, token string, cmId int) error
 }

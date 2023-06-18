@@ -61,7 +61,7 @@ func TestCommentUseCase_DeleteComment(t *testing.T) {
 	defer destructComments(db, mockedCm)
 	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
 
-	err = uC.DeleteComment(ctx, mockedCm[0].Id)
+	err = uC.DeleteComment(ctx, "", mockedCm[0].Id)
 	assert.NoError(t, err, "deleting comment failed")
 
 	tmpCm := new(Comment)

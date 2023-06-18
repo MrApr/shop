@@ -62,11 +62,16 @@ func TestCommentService_DeleteComment(t *testing.T) {
 	assert.Equal(t, testingCount, len(mockedCm), "Mocked comments length is not equal as expected")
 
 	randWrongId := rand.Int()
-	err = sv.DeleteComment(randWrongId)
+	err = sv.DeleteComment(randWrongId, mockedCm[0].UserId)
 	assert.Error(t, err, "Expected error on deleting wrong comment")
 	assert.ErrorIs(t, err, CommentNotFound, "Expected error on deleting wrong comment")
 
-	err = sv.DeleteComment(mockedCm[0].Id)
+	randWrongUserId := rand.Int()
+	err = sv.DeleteComment(mockedCm[0].Id, randWrongUserId)
+	assert.Error(t, err, "Expected error on deleting comment with wrong user id")
+	assert.ErrorIs(t, err, OperationNotAllowed, "Expected error on deleting comment with wrong user id")
+
+	err = sv.DeleteComment(mockedCm[0].Id, mockedCm[0].UserId)
 	assert.NoError(t, err, "deleting comment failed")
 
 	tmpCm := new(Comment)

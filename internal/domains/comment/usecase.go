@@ -39,6 +39,11 @@ func (c *CommentUseCase) CreateComment(ctx context.Context, token string, reques
 }
 
 // DeleteComment which already exists in database
-func (c *CommentUseCase) DeleteComment(ctx context.Context, cmId int) error {
-	return c.sv.DeleteComment(cmId)
+func (c *CommentUseCase) DeleteComment(ctx context.Context, token string, cmId int) error {
+	userId, err := c.decoderFn(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	return c.sv.DeleteComment(cmId, userId)
 }

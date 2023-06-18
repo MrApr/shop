@@ -91,9 +91,14 @@ func (cH *CommentEchoHandler) DeleteComment(e echo.Context) error {
 		return e.JSON(http.StatusInternalServerError, generateResponse(nil, wrongProductId))
 	}
 
+	bearerToken, err := reqTokenHandler.ExtractBearerToken(e.Request())
+	if err != nil {
+		return e.JSON(http.StatusForbidden, generateResponse(nil, err))
+	}
+
 	ctx := context.Background()
 
-	err = cH.uC.DeleteComment(ctx, cmIdInt)
+	err = cH.uC.DeleteComment(ctx, bearerToken, cmIdInt)
 	if err != nil {
 		return e.JSON(http.StatusNotFound, generateResponse(nil, err))
 	}
