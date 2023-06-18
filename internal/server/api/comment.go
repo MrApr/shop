@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/domains/comment"
+	"shop/internal/middleware/auth"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 	"strconv"
@@ -34,6 +35,7 @@ func AttachCommentHandlerWithCommentDomain(engine *echo.Echo, db *gorm.DB) {
 func setupCommentHandlerRoutes(engine *echo.Echo, cH *CommentEchoHandler) {
 	commentRoutes := engine.Group("/comments")
 	commentRoutes.GET("/products/:id", cH.GetAllProductComments)
+	commentRoutes.Use(auth.ValidateJWT)
 	commentRoutes.POST("", cH.CreateProductComment)
 	commentRoutes.DELETE("/:id", cH.DeleteComment)
 }

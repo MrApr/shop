@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/domains/user"
+	"shop/internal/middleware/auth"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 )
@@ -30,6 +31,9 @@ func setupUserRoutes(engine *echo.Echo, handler *userEchoHandler) {
 	userRouter.POST("", handler.Register)
 	userRouter.POST("/login", handler.Login)
 
+	userRouter.Use(auth.ValidateJWT)
+	userRouter.PUT("/profile/username", handler.UpdateUserName)
+	userRouter.PUT("/profile/pass", handler.UpdateUserPass)
 }
 
 // Register user in system

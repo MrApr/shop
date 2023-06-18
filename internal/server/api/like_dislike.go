@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/domains/products"
+	"shop/internal/middleware/auth"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 )
@@ -29,6 +30,8 @@ func AttachLikeDislikeToItsDomain(engine *echo.Echo, db *gorm.DB) {
 // setupLikeDislikeRoutes which are accessible through http URI
 func setupLikeDislikeRoutes(engine *echo.Echo, handler *likeDislikeEchoHandler) {
 	router := engine.Group("products")
+	router.Use(auth.ValidateJWT)
+
 	router.POST("/like", handler.Like)
 	router.POST("/dislike", handler.Dislike)
 }

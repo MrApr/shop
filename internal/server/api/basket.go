@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"shop/internal/domains/basket"
 	"shop/internal/domains/products"
+	"shop/internal/middleware/auth"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 )
@@ -31,6 +32,7 @@ func AttachBasketHandlerWithBasketDomain(engine *echo.Echo, db *gorm.DB) {
 // setupAddressRoutes which are accessible through http URI
 func setupBasketHandlerRoutes(engine *echo.Echo, bH *basketEchoHandler) {
 	basketRouter := engine.Group("/baskets")
+	basketRouter.Use(auth.ValidateJWT)
 
 	basketRouter.GET("/actives", bH.GetUserActiveBasket)
 	basketRouter.GET("", bH.GetAllUserBaskets)

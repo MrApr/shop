@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 	"shop/internal/domains/address"
+	"shop/internal/middleware/auth"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 )
@@ -33,6 +34,7 @@ func setupAddressRoutes(engine *echo.Echo, addrHandler *addressEchoHandler) {
 	cities.GET("", addrHandler.GetAllCities)
 
 	addressRoutes := engine.Group("/addresses")
+	addressRoutes.Use(auth.ValidateJWT)
 	addressRoutes.GET("", addrHandler.GetAllUserAddresses)
 }
 
