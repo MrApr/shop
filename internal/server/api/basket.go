@@ -19,8 +19,8 @@ type basketEchoHandler struct {
 	uC basket.BasketUseCaseInterface
 }
 
-// attachBasketHandlerWithBasketDomain for working with rest Apis
-func attachBasketHandlerWithBasketDomain(engine *echo.Echo, db *gorm.DB) {
+// AttachBasketHandlerWithBasketDomain for working with rest Apis
+func AttachBasketHandlerWithBasketDomain(engine *echo.Echo, db *gorm.DB) {
 	productService := products.NewProductsService(products.NewProductRepository(db))
 	basketUseCase := basket.NewUseCase(basket.NewBasketService(basket.NewBasketRepository(db), productService), nil)
 	setupBasketHandlerRoutes(engine, &basketEchoHandler{
@@ -36,6 +36,8 @@ func setupBasketHandlerRoutes(engine *echo.Echo, bH *basketEchoHandler) {
 	basketRouter.GET("", bH.GetAllUserBaskets)
 	basketRouter.POST("", bH.CreateUserBasket)
 	basketRouter.DELETE("", bH.DisableActiveBasket)
+	basketRouter.POST("/products", bH.AddProductsToBasket)
+	basketRouter.PUT("/products", bH.UpdateBasketProducts)
 }
 
 // GetUserActiveBasket and return it
