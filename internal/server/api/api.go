@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"shop/pkg/validation"
 )
 
@@ -40,9 +39,4 @@ func convertValidationErrors(errs []*validation.ValidationError) string {
 	}
 
 	return string(marshaledData)
-}
-
-// generateVerificationMessage on success request
-func generateVerificationMessage(id int) string {
-	return fmt.Sprintf("Verification request submitted successfully with id: %d", id)
 }
