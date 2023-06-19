@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  mysql:
+    image: mariadb:10.5.8
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/Applications/docker_images/dbs/shop:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456789
+      - MYSQL_PASSWORD=123456789
+      - MYSQL_USER=heroes
+      - MYSQL_DATABASE=shop
+    networks:
+      - fire_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3306" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  website:
+    container_name: "shop_service"
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "8000:8000"
+    working_dir: "/app"
+    restart: on-failure
+    command:
+      - shop
+    environment:
+      MYSQL_USER: "heroes"
+      MYSQL_PASS: "123456789"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_ADDR: "localhost"
+      MYSQL_DB: "shop"
+      PATH: "/app"
+      ENV_DIR: "/app/.env"
+    networks:
+      - fire_network
+    depends_on:
+      - mysql
+networks:
+  fire_network:
+    driver: bridge
