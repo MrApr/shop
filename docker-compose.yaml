@@ -27,8 +27,7 @@ services:
       - "8000:8000"
     working_dir: "/app"
     restart: on-failure
-    command:
-      - shop
+    command: /bin/sh -c "shop -migrate && shop"
     environment:
       MYSQL_USER: "heroes"
       MYSQL_PASS: "123456789"
@@ -40,7 +39,7 @@ services:
       ENV_DIR: "/app/.env"
     networks:
       - fire_network
-    depends_on:
+    depends_on:F
       - mysql
 networks:
   fire_network:
