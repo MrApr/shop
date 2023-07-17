@@ -8,7 +8,7 @@ type User struct {
 	UUID        string     `json:"uuid" gorm:"uniqueIndex"`
 	PhoneNumber string     `json:"phone_number" gorm:"uniqueIndex"`
 	Name        *string    `json:"name,omitempty"`
-	Password    string     `json:"password"`
+	Password    string     `json:"-"`
 	LastLoginAt *time.Time `json:"last_login_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`

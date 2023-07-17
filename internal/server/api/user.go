@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"shop/internal/domains/user"
 	"shop/internal/middleware/auth"
+	"shop/pkg/IP"
 	"shop/pkg/reqTokenHandler"
 	"shop/pkg/validation"
 )
@@ -28,7 +29,7 @@ func AttachUserHandlerToUserDomain(engine *echo.Echo, db *gorm.DB) {
 func setupUserRoutes(engine *echo.Echo, handler *userEchoHandler) {
 	userRouter := engine.Group("/users")
 
-	userRouter.POST("", handler.Register)
+	userRouter.POST("/register", handler.Register)
 	userRouter.POST("/login", handler.Login)
 
 	userRouter.Use(auth.ValidateJWT)
@@ -49,6 +50,7 @@ func (uH *userEchoHandler) Register(e echo.Context) error {
 	}
 
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, user.ContextValueIpKey, IP.ExtractFromEcho(e))
 
 	registerResp, err := uH.uC.Register(ctx, request)
 	if err != nil {
