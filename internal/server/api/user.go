@@ -73,6 +73,7 @@ func (uH *userEchoHandler) Login(e echo.Context) error {
 	}
 
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, user.ContextValueIpKey, IP.ExtractFromEcho(e))
 
 	loginResp, err := uH.uC.Login(ctx, request)
 	if err != nil {
