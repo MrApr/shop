@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"shop/pkg/IP"
 	"shop/pkg/tokenizer"
+	"strings"
 )
 
 // unAuthorizedMsg defines a message for authorization
@@ -21,6 +22,7 @@ func ValidateJWT(next echo.HandlerFunc) echo.HandlerFunc {
 		if bearerToken == "" {
 			return c.JSON(http.StatusUnauthorized, unAuthorizedMsg)
 		}
+		bearerToken = fixSentTokenString(bearerToken)
 
 		ip := IP.ExtractFromEcho(c)
 		isAllowed := handleJwtValidation(bearerToken, ip)
@@ -38,4 +40,12 @@ func handleJwtValidation(token, ip string) bool {
 	ctx := context.Background()
 	tokenHandler := tokenizer.CreateTokenizer(ctx)
 	return tokenHandler.IsActive(token, ip)
+}
+
+// fixSentTokenString and return it in order to make it use-able
+func fixSentTokenString(token string) string {
+	token = strings.Replace(token, "Bearer", "", 1)
+	token = strings.Replace(token, "bearer", "", 1)
+	token = strings.Trim(token, " ")
+	return token
 }
