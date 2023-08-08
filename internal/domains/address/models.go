@@ -1,17 +1,20 @@
 package address
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 // Address is a struct which defines address entity fields and properties in system
 type Address struct {
-	Id        int        `json:"id" gorm:"primaryKey"`
-	UserId    int        `json:"-"`
-	CityId    int        `json:"city_id"`
-	City      *City      `json:"city,omitempty" gorm:"foreignKey:CityId;references:Id"`
-	Address   string     `json:"address"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	Id        int            `json:"id" gorm:"primaryKey"`
+	UserId    int            `json:"-"`
+	CityId    int            `json:"city_id"`
+	City      *City          `json:"city,omitempty" gorm:"foreignKey:CityId;references:Id"`
+	Address   string         `json:"address"`
+	CreatedAt *time.Time     `json:"created_at,omitempty"`
+	UpdatedAt *time.Time     `json:"updated_at,omitempty"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty"`
 }
 
 // TableName overrides table name for gorm model
