@@ -33,9 +33,12 @@ func setupAddressRoutes(engine *echo.Echo, addrHandler *addressEchoHandler) {
 	cities := engine.Group("/cities")
 	cities.GET("", addrHandler.GetAllCities)
 
-	addressRoutes := engine.Group("/addresses")
+	addressRoutes := engine.Group("/users/addresses")
 	addressRoutes.Use(auth.ValidateJWT)
 	addressRoutes.GET("", addrHandler.GetAllUserAddresses)
+	addressRoutes.POST("", addrHandler.CreateAddress)
+	addressRoutes.PUT("", addrHandler.UpdateAddress)
+	addressRoutes.DELETE("", addrHandler.DeleteAddress)
 }
 
 // GetAllCities and return them
