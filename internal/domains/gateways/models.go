@@ -1,6 +1,9 @@
 package gateways
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 // GatewayType represents gateways entity type
 type GatewayType struct {
@@ -13,15 +16,15 @@ type GatewayType struct {
 
 // GateWay represents Gateway entity which handles payments in system
 type GateWay struct {
-	Id            int          `json:"id" gorm:"primaryKey"`
-	Name          string       `json:"name"`
-	GatewayTypeId int          `json:"gateway_type_id"`
-	Type          *GatewayType `json:"GatewayType" gorm:"foreignKey:GatewayTypeId;references:Id"`
-	Token         string       `json:"-" gorm:"index"`
-	Status        bool         `json:"status"  gorm:"index"`
-	CreatedAt     *time.Time   `json:"created_at,omitempty"`
-	UpdatedAt     *time.Time   `json:"updated_at,omitempty"`
-	DeletedAt     *time.Time   `json:"deleted_at,omitempty"`
+	Id            int            `json:"id" gorm:"primaryKey"`
+	Name          string         `json:"name"`
+	GatewayTypeId int            `json:"gateway_type_id"`
+	Type          *GatewayType   `json:"GatewayType" gorm:"foreignKey:GatewayTypeId;references:Id"`
+	Token         string         `json:"-" gorm:"index"`
+	Status        bool           `json:"status"  gorm:"index"`
+	CreatedAt     *time.Time     `json:"created_at,omitempty"`
+	UpdatedAt     *time.Time     `json:"updated_at,omitempty"`
+	DeletedAt     gorm.DeletedAt `json:"deleted_at,omitempty"`
 }
 
 // TableName overrides table name in gorm db

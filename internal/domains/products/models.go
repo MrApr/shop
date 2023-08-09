@@ -1,14 +1,17 @@
 package products
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 // Type struct defines type entity
 type Type struct {
-	Id        int        `json:"id" gorm:"primaryKey"`
-	Title     string     `json:"title"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	Id        int            `json:"id" gorm:"primaryKey"`
+	Title     string         `json:"title"`
+	CreatedAt *time.Time     `json:"created_at,omitempty"`
+	UpdatedAt *time.Time     `json:"updated_at,omitempty"`
+	DeletedAt gorm.DeletedAt `json:"deleted_at,omitempty"`
 }
 
 // GetAllTypesRequest is the struct which represents get all types request
@@ -43,19 +46,19 @@ type GetAllCategoriesRequest struct {
 
 // Product represent product entity in system
 type Product struct {
-	Id          int        `json:"id" gorm:"primaryKey"`
-	Categories  []Category `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
-	Likes       []Like     `json:"likes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
-	Dislikes    []DisLike  `json:"dislikes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
-	Title       string     `json:"title" gorm:"index"`
-	Code        int        `json:"code" gorm:"uniqueIndex"`
-	Amount      int        `json:"amount"`
-	Price       float64    `json:"price" gorm:"index"`
-	Weight      *int       `json:"weight"`
-	Description *string    `json:"description"`
-	CreatedAt   *time.Time `json:"created_at,omitempty"`
-	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
-	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+	Id          int            `json:"id" gorm:"primaryKey"`
+	Categories  []Category     `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
+	Likes       []Like         `json:"likes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
+	Dislikes    []DisLike      `json:"dislikes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
+	Title       string         `json:"title" gorm:"index"`
+	Code        int            `json:"code" gorm:"uniqueIndex"`
+	Amount      int            `json:"amount"`
+	Price       float64        `json:"price" gorm:"index"`
+	Weight      *int           `json:"weight"`
+	Description *string        `json:"description"`
+	CreatedAt   *time.Time     `json:"created_at,omitempty"`
+	UpdatedAt   *time.Time     `json:"updated_at,omitempty"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty"`
 }
 
 // GetAllProductsRequest and return them
