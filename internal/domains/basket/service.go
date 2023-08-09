@@ -57,14 +57,18 @@ func (b *BasketService) DisableUserActiveBasket(userId int) error {
 
 // AddProductsToBasket for user which has already an active basket
 func (b *BasketService) AddProductsToBasket(userId, productId, amount int) (*Basket, error) {
-	err := b.checkAndUpdateProductStack(productId, amount)
-	if err != nil {
-		return nil, err
-	}
-
 	activeBasket, err := b.getOrCreateUserActiveBasket(userId)
 	if err != nil {
 		return nil, advancedError.New(err, "Cannot create or get user active basket")
+	}
+
+	if b.productExistsInBasket(activeBasket.Id, productId) {
+		return b.UpdateBasketProductsAmount(userId, productId, amount)
+	}
+
+	err = b.checkAndUpdateProductStack(productId, amount)
+	if err != nil {
+		return nil, err
 	}
 
 	price := b.getProductPrice(productId)
@@ -118,6 +122,11 @@ func (b *BasketService) UpdateBasketProductsAmount(userId, productId, amount int
 // checkAndDisableActiveBasket for user in order to create a new one
 func (b *BasketService) checkAndDisableActiveBasket(userId int) error {
 	activeBasket, err := b.basketRepo.GetUserActiveBasket(userId)
+
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	}
+
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
@@ -185,9 +194,11 @@ func (b *BasketService) createBasketProduct(productId, amount int, price float64
 
 // calculateRemainingRequiredAmount and return it for updating usage
 func (b *BasketService) calculateRemainingRequiredAmount(basketAmount, requiredAmount int) int {
-	if basketAmount >= requiredAmount {
-		return basketAmount - requiredAmount
-	}
-
 	return requiredAmount - basketAmount
+}
+
+// productExistsInBasket or not
+func (b *BasketService) productExistsInBasket(basketId, productId int) bool {
+	_, err := b.basketRepo.GetBasketProduct(basketId, productId)
+	return err == nil
 }

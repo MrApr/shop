@@ -1,6 +1,7 @@
 package basket
 
 import (
+	"gorm.io/gorm"
 	"shop/internal/domains/products"
 	"time"
 )
@@ -13,7 +14,7 @@ type Basket struct {
 	Products  []products.Product `json:"products" gorm:"many2many:basket_products;foreignKey:Id;joinForeignKey:BasketId;References:Id;joinReferences:ProductId"`
 	CreatedAt *time.Time         `json:"created_at,omitempty"`
 	UpdatedAt *time.Time         `json:"updated_at,omitempty"`
-	DeletedAt *time.Time         `json:"deleted_at,omitempty"`
+	DeletedAt gorm.DeletedAt     `json:"deleted_at,omitempty"`
 }
 
 // BasketProduct is the struct which represents basket_products table
