@@ -5,3 +5,4 @@ CREATE TABLE `product_categories`
     FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
     FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
 );
+CREATE UNIQUE INDEX product_cat_unique ON `product_categories`(`product_id`, category_id);
