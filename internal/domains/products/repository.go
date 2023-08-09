@@ -39,7 +39,7 @@ func (c *CategoryRepository) GetAllCategories(title *string, parentCatId, typeId
 	db := c.db
 
 	if title != nil {
-		titleTmp := c.prepareTitleForSearch(title)
+		titleTmp := prepareTitleForSearch(title)
 		db = db.Where("title LIKE ?", titleTmp)
 	}
 
@@ -104,11 +104,13 @@ func (p *ProductRepository) GetAllProducts(categories []int, title, description 
 	}
 
 	if title != nil {
-		db = db.Where("title LIKE ?", *title)
+		titleTmp := prepareTitleForSearch(title)
+		db = db.Where("title LIKE ?", titleTmp)
 	}
 
 	if description != nil {
-		db = db.Where("description LIKE ?", *description)
+		tmpDescp := prepareTitleForSearch(description)
+		db = db.Where("description LIKE ?", tmpDescp)
 	}
 
 	if minWeight != nil {
@@ -212,6 +214,6 @@ func (l *LikeDislikeRepository) RemoveDislike(productId, userId int) error {
 }
 
 // prepareTitleForSearch in order to make it useable with LIKE query in mysql
-func (c *CategoryRepository) prepareTitleForSearch(title *string) string {
+func prepareTitleForSearch(title *string) string {
 	return fmt.Sprintf("%s%s%s", "%", *title, "%")
 }
