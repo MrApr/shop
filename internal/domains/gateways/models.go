@@ -17,7 +17,7 @@ type GateWay struct {
 	Name          string       `json:"name"`
 	GatewayTypeId int          `json:"gateway_type_id"`
 	Type          *GatewayType `json:"GatewayType" gorm:"foreignKey:GatewayTypeId;references:Id"`
-	Token         string       `json:"token" gorm:"index"`
+	Token         string       `json:"-" gorm:"index"`
 	Status        bool         `json:"status"  gorm:"index"`
 	CreatedAt     *time.Time   `json:"created_at,omitempty"`
 	UpdatedAt     *time.Time   `json:"updated_at,omitempty"`
