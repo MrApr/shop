@@ -2,6 +2,7 @@ package products
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -38,7 +39,8 @@ func (c *CategoryRepository) GetAllCategories(title *string, parentCatId, typeId
 	db := c.db
 
 	if title != nil {
-		db = db.Where("title LIKE ?", *title)
+		titleTmp := c.prepareTitleForSearch(title)
+		db = db.Where("title LIKE ?", titleTmp)
 	}
 
 	if parentCatId != nil {
@@ -207,4 +209,9 @@ func (l *LikeDislikeRepository) RemoveDislike(productId, userId int) error {
 		ProductId: productId,
 		UserId:    userId,
 	}).Error
+}
+
+// prepareTitleForSearch in order to make it useable with LIKE query in mysql
+func (c *CategoryRepository) prepareTitleForSearch(title *string) string {
+	return fmt.Sprintf("%s%s%s", "%", *title, "%")
 }
