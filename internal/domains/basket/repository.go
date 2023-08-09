@@ -20,7 +20,7 @@ func NewBasketRepository(db *gorm.DB) BasketRepositoryInterface {
 // GetUserActiveBasket which has status true
 func (b *SqlBasket) GetUserActiveBasket(userId int) (*Basket, error) {
 	activeBasket := new(Basket)
-	result := b.db.Where("user_id = ?", userId).Where("status = ?", true).First(activeBasket)
+	result := b.db.Preload("Products").Where("user_id = ?", userId).Where("status = ?", true).First(activeBasket)
 	return activeBasket, result.Error
 }
 
@@ -62,8 +62,7 @@ func (b *SqlBasket) CreateBasket(userBasket *Basket) error {
 
 // DisableBasket by making it's Status false
 func (b *SqlBasket) DisableBasket(userBasket *Basket) error {
-	userBasket.Status = false
-	return b.db.Save(userBasket).Error
+	return b.db.Model(Basket{}).Where("id = ?", userBasket.Id).Update("status", false).Error
 }
 
 // AddProductToBasket which is already doesn't exist

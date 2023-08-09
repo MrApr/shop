@@ -131,8 +131,32 @@ func (b *BasketService) checkAndDisableActiveBasket(userId int) error {
 		return err
 	}
 
+	err = b.revertBasketProductsStack(activeBasket.Id)
+	if err != nil {
+		return err
+	}
+
 	err = b.basketRepo.DisableBasket(activeBasket)
 	return err
+}
+
+// revertBasketProductsStack in order to get disabled
+func (b *BasketService) revertBasketProductsStack(basketId int) error {
+	activeBasket, err := b.basketRepo.GetBasketById(basketId)
+	if err != nil {
+		return err
+	}
+
+	for _, product := range activeBasket.Products {
+		basketProduct, err := b.basketRepo.GetBasketProduct(activeBasket.Id, product.Id)
+		if err != nil {
+			continue
+		}
+
+		newInventory := basketProduct.Amount + product.Amount
+		b.productService.UpdateProductInventory(product.Id, newInventory)
+	}
+	return nil
 }
 
 // getProductPrice and return it
