@@ -108,6 +108,10 @@ func (l *LikeDislikeService) LikeProduct(productId, userId int) error {
 		return l.repo.RemoveLike(productId, userId)
 	}
 
+	if err := l.removeDislike(productId, userId); err != nil {
+		return err
+	}
+
 	liked := l.repo.LikeProduct(productId, userId)
 	if liked.ProductId == productId && liked.UserId == userId {
 		return nil
@@ -122,10 +126,30 @@ func (l *LikeDislikeService) DislikeProduct(productId, userId int) error {
 		return l.repo.RemoveDislike(productId, userId)
 	}
 
+	if err := l.removeLike(productId, userId); err != nil {
+		return err
+	}
+
 	disliked := l.repo.DislikeProduct(productId, userId)
 	if disliked.ProductId == productId && disliked.UserId == userId {
 		return nil
 	}
 
 	return InternalServerError
+}
+
+// removeDislike when it exists
+func (l *LikeDislikeService) removeDislike(productId, userId int) error {
+	if l.repo.DisLikeExists(productId, userId) {
+		return l.repo.RemoveDislike(productId, userId)
+	}
+	return nil
+}
+
+// removeLike when it exists
+func (l *LikeDislikeService) removeLike(productId, userId int) error {
+	if l.repo.LikeExists(productId, userId) {
+		return l.repo.RemoveLike(productId, userId)
+	}
+	return nil
 }
