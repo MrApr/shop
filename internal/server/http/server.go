@@ -59,7 +59,7 @@ func registerServices(conn *gorm.DB, router *echo.Echo) {
 
 // appendRequiredMiddlewares to http router function
 func appendRequiredMiddlewares(router *echo.Echo) {
-	//router.Use(middleware.Logger())
+	router.Use(middleware.Logger())
 	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},

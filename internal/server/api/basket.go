@@ -39,7 +39,7 @@ func setupBasketHandlerRoutes(engine *echo.Echo, bH *basketEchoHandler) {
 	basketRouter.POST("", bH.CreateUserBasket)
 	basketRouter.DELETE("", bH.DisableActiveBasket)
 	basketRouter.POST("/products", bH.AddProductsToBasket)
-	basketRouter.PUT("/products", bH.UpdateBasketProducts)
+	basketRouter.PATCH("/products", bH.UpdateBasketProducts)
 }
 
 // GetUserActiveBasket and return it
