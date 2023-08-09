@@ -147,7 +147,9 @@ func (p *ProductRepository) GetProduct(id int) *Product {
 
 // UpdateProduct which is already exists
 func (p *ProductRepository) UpdateProduct(product *Product) error {
-	return p.db.Save(product).Error
+	return p.db.Model(product).Updates(Product{
+		Amount: product.Amount,
+	}).Error
 }
 
 // NewLikeDislikeRepository and return it

@@ -74,7 +74,10 @@ func (b *SqlBasket) AddProductToBasket(userBasket *Basket, basketProduct *Basket
 
 // UpdateBasketProducts which is already exists in database
 func (b *SqlBasket) UpdateBasketProducts(basketProduct *BasketProduct) error {
-	return b.db.Where("product_id = ?", basketProduct.ProductId).Where("basket_id = ?", basketProduct.BasketId).Save(basketProduct).Error
+	return b.db.Model(basketProduct).Where("product_id = ?", basketProduct.ProductId).Where("basket_id = ?", basketProduct.BasketId).Updates(BasketProduct{
+		Amount:    basketProduct.Amount,
+		UnitPrice: basketProduct.UnitPrice,
+	}).Error
 }
 
 // ClearBasketProducts which already exists in db for a specific basket
