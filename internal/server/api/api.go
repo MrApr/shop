@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"shop/pkg/validation"
 )
 
@@ -14,7 +13,7 @@ func generateResponse(data any, message any) map[string]interface{} {
 }
 
 // convertMessage to string and return it
-func convertMessage(message any) string {
+func convertMessage(message any) any {
 	var convertedMsg string
 
 	switch val := message.(type) {
@@ -23,20 +22,10 @@ func convertMessage(message any) string {
 	case string:
 		convertedMsg = val
 	case []*validation.ValidationError:
-		convertedMsg = convertValidationErrors(val)
+		return val
 	default:
 		convertedMsg = ""
 	}
 
 	return convertedMsg
-}
-
-// convertValidationErrors into a single string
-func convertValidationErrors(errs []*validation.ValidationError) string {
-	marshaledData, err := json.Marshal(errs)
-	if err != nil {
-		return ""
-	}
-
-	return string(marshaledData)
 }
