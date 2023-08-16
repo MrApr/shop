@@ -39,7 +39,7 @@ services:
       ENV_DIR: "/app/.env"
     networks:
       - fire_network
-    depends_on:F
+    depends_on:
       - mysql
 networks:
   fire_network:
