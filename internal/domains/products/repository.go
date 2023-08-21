@@ -96,7 +96,7 @@ func NewProductRepository(db *gorm.DB) ProductsRepositoryInterface {
 // GetAllProducts and return them based on given arguments
 func (p *ProductRepository) GetAllProducts(categories []int, title, description *string, minWeight, maxWeight *int, minPrice, maxPrice *float64, limit *int, offset int) []Product {
 	var products []Product
-	db := p.db.Preload("Categories")
+	db := p.db.Preload("Categories").Preload("Image")
 
 	if categories != nil {
 		db = db.Joins("JOIN product_categories ON product_categories.product_id = products.id").
@@ -141,7 +141,7 @@ func (p *ProductRepository) GetAllProducts(categories []int, title, description 
 // GetProduct and return it based on passing id
 func (p *ProductRepository) GetProduct(id int) *Product {
 	product := new(Product)
-	p.db.Preload("Categories").Where("id = ?", id).First(product)
+	p.db.Preload("Categories").Preload("Image").Where("id = ?", id).First(product)
 	return product
 }
 

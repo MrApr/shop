@@ -2,6 +2,7 @@ package products
 
 import (
 	"gorm.io/gorm"
+	"shop/internal/domains/image"
 	"time"
 )
 
@@ -47,6 +48,7 @@ type GetAllCategoriesRequest struct {
 // Product represent product entity in system
 type Product struct {
 	Id          int            `json:"id" gorm:"primaryKey"`
+	Image       *image.Image   `json:"image" gorm:"polymorphic:Imageable;polymorphicValue:product"`
 	Categories  []Category     `json:"categories" gorm:"many2many:product_categories;foreignKey:Id;joinForeignKey:ProductId;References:Id;joinReferences:CategoryId"`
 	Likes       []Like         `json:"likes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
 	Dislikes    []DisLike      `json:"dislikes,omitempty" gorm:"foreignKey:ProductId;references:Id"`
